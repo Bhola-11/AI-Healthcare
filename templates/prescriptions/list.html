@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}E-Prescriptions & Medication Orders - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>E-Prescriptions Registry</h1>
+            <p class="hs-text-muted">Digital medication orders with SHA-256 physician cryptographic verification</p>
+        </div>
+        <a href="{% url 'prescriptions:create' %}" class="hs-btn hs-btn-primary">+ Issue New Prescription</a>
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Rx #</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Prescribing Clinician</th>
+                    <th style="padding: 0.75rem;">Issued Date</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in prescriptions %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ r.rx_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ r.patient.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">Dr. {{ r.doctor.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">{{ r.prescribed_at|date:"M d, Y" }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ r.get_status_display }}</span></td>
+                    <td style="padding: 0.75rem;"><a href="{% url 'prescriptions:detail' r.id %}" class="hs-btn hs-btn-outline-sm">View Rx</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 1rem;" class="hs-text-muted">No prescriptions issued.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
