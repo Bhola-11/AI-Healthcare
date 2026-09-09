@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Invoices & Billing Accounts - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Invoices & Billing Accounts</h1>
+    <p class="hs-text-muted">Itemized patient charges, fee tariffs, insurance splits, and ledger accounting</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Invoice #</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Total</th>
+                    <th style="padding: 0.75rem;">Paid</th>
+                    <th style="padding: 0.75rem;">Balance Due</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ inv.invoice_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ inv.patient.user.get_full_name }} ({{ inv.patient.mrn }})</td>
+                    <td style="padding: 0.75rem;">${{ inv.total_amount }}</td>
+                    <td style="padding: 0.75rem;">${{ inv.amount_paid }}</td>
+                    <td style="padding: 0.75rem;"><strong>${{ inv.balance_due }}</strong></td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ inv.get_status_display }}</span></td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'billing:detail' inv.id %}" class="hs-btn hs-btn-outline-sm">View Itemized</a>
+                        {% if inv.balance_due > 0 %}
+                        <a href="{% url 'billing:pay' inv.id %}" class="hs-btn hs-btn-primary-sm">Collect Payment</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="padding: 1rem;" class="hs-text-muted">No invoices recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

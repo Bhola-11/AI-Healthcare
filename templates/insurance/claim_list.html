@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Insurance Claims Registry - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Health Insurance Claims & Adjudications</h1>
+    <p class="hs-text-muted">Electronic payor submissions, pre-authorizations, and remittance reconciliations</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Claim #</th>
+                    <th style="padding: 0.75rem;">Payor Provider</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Claimed</th>
+                    <th style="padding: 0.75rem;">Approved</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in claims %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ c.claim_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ c.policy.provider.name }}</td>
+                    <td style="padding: 0.75rem;">{{ c.policy.patient.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">${{ c.claimed_amount }}</td>
+                    <td style="padding: 0.75rem;">${{ c.approved_amount }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ c.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 1rem;" class="hs-text-muted">No insurance claims filed.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
