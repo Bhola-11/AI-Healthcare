@@ -1,0 +1,22 @@
+<aside class="hs-sidebar">
+    <div class="hs-sidebar-menu">
+        <div class="hs-menu-category">Clinical Portals</div>
+        <a href="{% url 'accounts:dashboard' %}" class="hs-sidebar-link">📊 Dashboard</a>
+        <a href="{% url 'patients:list' %}" class="hs-sidebar-link">🏥 Patients & Vitals</a>
+        <a href="{% url 'appointments:list' %}" class="hs-sidebar-link">📅 Appointments & Queue</a>
+        <a href="{% url 'clinical_records:encounters' %}" class="hs-sidebar-link">📋 EMR & SOAP Notes</a>
+        <a href="{% url 'prescriptions:list' %}" class="hs-sidebar-link">💊 Prescriptions</a>
+        
+        <div class="hs-menu-category">Diagnostics & Support</div>
+        <a href="{% url 'laboratory:orders' %}" class="hs-sidebar-link">🧪 Laboratory & Pathology</a>
+        <a href="{% url 'pharmacy:inventory' %}" class="hs-sidebar-link">📦 Pharmacy Inventory</a>
+        <a href="{% url 'ai_engine:triage' %}" class="hs-sidebar-link">🤖 AI Triage & CDSS</a>
+        
+        <div class="hs-menu-category">Administration & Finance</div>
+        <a href="{% url 'facilities:list' %}" class="hs-sidebar-link">🏢 Facilities & Wards</a>
+        <a href="{% url 'doctors:directory' %}" class="hs-sidebar-link">🩺 Clinicians Directory</a>
+        <a href="{% url 'billing:invoices' %}" class="hs-sidebar-link">💳 Invoices & Billing</a>
+        <a href="{% url 'insurance:claims' %}" class="hs-sidebar-link">🛡️ Insurance Claims</a>
+        <a href="{% url 'analytics:kpis' %}" class="hs-sidebar-link">📈 Analytics & KPIs</a>
+    </div>
+</aside>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HealthSphere - Enterprise Clinical Platform{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/healthsphere.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="hs-body">
+    {% include 'partials/navbar.html' %}
+    <div class="hs-layout-container">
+        {% if user.is_authenticated %}
+            {% include 'partials/sidebar.html' %}
+        {% endif %}
+        <main class="hs-main-content">
+            {% include 'partials/alerts.html' %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% include 'partials/footer.html' %}
+    <script src="/static/js/healthsphere.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

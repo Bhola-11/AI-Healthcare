@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Sign In - HealthSphere Platform{% endblock %}
+{% block content %}
+<div class="hs-auth-wrapper">
+    <div class="hs-card hs-auth-card">
+        <div class="hs-card-header text-center">
+            <span class="hs-auth-icon">⚕</span>
+            <h2>Sign in to HealthSphere</h2>
+            <p class="hs-text-muted">Enter your verified healthcare credentials</p>
+        </div>
+        <div class="hs-card-body">
+            <form method="post" action="{% url 'accounts:login' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="hs-form-actions">
+                    <button type="submit" class="hs-btn hs-btn-primary hs-btn-block">Sign In</button>
+                </div>
+            </form>
+        </div>
+        <div class="hs-card-footer text-center">
+            <p>New patient? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

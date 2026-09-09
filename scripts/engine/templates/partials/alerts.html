@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="hs-messages-container">
+    {% for message in messages %}
+    <div class="hs-alert hs-alert-{{ message.tags }}">
+        <span class="hs-alert-text">{{ message }}</span>
+        <button class="hs-alert-close" onclick="this.parentElement.remove();">&times;</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

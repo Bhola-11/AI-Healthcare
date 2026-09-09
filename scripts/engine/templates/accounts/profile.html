@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}User Profile - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-profile-wrapper">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h2>User Profile & Security Settings</h2>
+        </div>
+        <div class="hs-card-body">
+            <form method="post" action="{% url 'accounts:profile' %}">
+                {% csrf_token %}
+                <div class="hs-form-grid">
+                    {{ form.as_p }}
+                </div>
+                <div class="hs-form-actions mt-4">
+                    <button type="submit" class="hs-btn hs-btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
