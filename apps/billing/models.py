@@ -44,11 +44,11 @@ class Invoice(models.Model):
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="invoices")
     encounter = models.ForeignKey(Encounter, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices")
     
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
     
     status = models.CharField(max_length=32, choices=Status.choices, default=Status.ISSUED, db_index=True)
     due_date = models.DateField()
@@ -61,11 +61,16 @@ class Invoice(models.Model):
 
     @property
     def balance_due(self):
-        return self.total_amount - self.amount_paid
+        tot = Decimal(str(self.total_amount or "0.00"))
+        paid = Decimal(str(self.amount_paid or "0.00"))
+        return tot - paid
 
     def calculate_totals(self):
-        self.subtotal = sum((item.quantity * item.unit_price) for item in self.items.all())
-        self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
+        items = list(self.items.all())
+        self.subtotal = sum((Decimal(str(it.quantity)) * it.unit_price) for it in items) if items else Decimal("0.00")
+        tax = Decimal(str(self.tax_amount or "0.00"))
+        discount = Decimal(str(self.discount_amount or "0.00"))
+        self.total_amount = self.subtotal + tax - discount
         self.save()
 
     def __str__(self):
