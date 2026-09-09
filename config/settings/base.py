@@ -149,3 +149,15 @@ SPECTACULAR_SETTINGS = {
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+from django.db.backends.signals import connection_created
+from django.dispatch import receiver
+
+@receiver(connection_created)
+def configure_sqlite_wal(sender, connection, **kwargs):
+    if connection.vendor == 'sqlite':
+        cursor = connection.cursor()
+        cursor.execute('PRAGMA journal_mode = WAL;')
+        cursor.execute('PRAGMA synchronous = NORMAL;')
+        cursor.execute('PRAGMA foreign_keys = ON;')
+        cursor.execute('PRAGMA busy_timeout = 60000;')
