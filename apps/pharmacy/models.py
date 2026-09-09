@@ -64,3 +64,16 @@ class BatchInventory(models.Model):
 
     def __str__(self):
         return f"{self.medication.brand_name} Lot:{self.batch_number} (Qty: {self.quantity_on_hand}, Exp: {self.expiry_date})"
+
+class DispensationRecord(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    batch = models.ForeignKey(BatchInventory, on_delete=models.CASCADE, related_name="dispensations")
+    rx_item_id = models.UUIDField(null=True, blank=True)
+    quantity_dispensed = models.PositiveIntegerField()
+    dispensed_by = models.CharField(max_length=255, default="Staff Pharmacist")
+    dispensed_at = models.DateTimeField(default=timezone.now)
+    patient_counseling_completed = models.BooleanField(default=True)
+    notes = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "hs_pharmacy_dispensations"

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Pharmacy Inventory & Formulary - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Pharmacy Formulary & Inventory</h1>
+            <p class="hs-text-muted">Real-time stock on hand, batch lots, and expiry tracking</p>
+        </div>
+        <a href="{% url 'pharmacy:workbench' %}" class="hs-btn hs-btn-primary">Go to Dispensing Workbench</a>
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Medication</th>
+                    <th style="padding: 0.75rem;">Form / Strength</th>
+                    <th style="padding: 0.75rem;">ATC Code</th>
+                    <th style="padding: 0.75rem;">Drug Class</th>
+                    <th style="padding: 0.75rem;">Active Batches</th>
+                    <th style="padding: 0.75rem;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medications %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ m.brand_name }}</strong> ({{ m.generic_name }})</td>
+                    <td style="padding: 0.75rem;">{{ m.get_dosage_form_display }} {{ m.strength }}</td>
+                    <td style="padding: 0.75rem;"><code>{{ m.atc_code }}</code></td>
+                    <td style="padding: 0.75rem;">{{ m.drug_class }}</td>
+                    <td style="padding: 0.75rem;">
+                        {% for b in m.batches.all %}
+                        <span class="hs-user-badge {% if b.is_low_stock %}hs-badge-urgent{% endif %}">Lot {{ b.batch_number }}: {{ b.quantity_on_hand }} units (Exp: {{ b.expiry_date }})</span><br>
+                        {% empty %}
+                        <span class="hs-text-danger">Out of Stock</span>
+                        {% endfor %}
+                    </td>
+                    <td style="padding: 0.75rem;">${{ m.unit_price }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 1rem;" class="hs-text-muted">No medications in catalog.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
