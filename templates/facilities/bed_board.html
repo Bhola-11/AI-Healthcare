@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Bed Occupancy Board - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Live Hospital Bed Board</h1>
+    <p class="hs-text-muted">Real-time room occupancy, turnover, and infection control statuses</p>
+</div>
+
+<div class="hs-metrics-grid">
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Total Beds</div>
+        <div class="hs-metric-value">{{ total }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Available Clean</div>
+        <div class="hs-metric-value hs-status-live">{{ available }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Occupied Patients</div>
+        <div class="hs-metric-value">{{ occupied }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Cleaning / Maintenance</div>
+        <div class="hs-metric-value hs-text-danger">{{ maintenance }}</div>
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-header">
+        <h3>Bed Status Matrix</h3>
+    </div>
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Bed Identifier</th>
+                    <th style="padding: 0.75rem;">Room</th>
+                    <th style="padding: 0.75rem;">Ward</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Last Sanitized</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in beds %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ b.bed_identifier }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ b.room.room_number }}</td>
+                    <td style="padding: 0.75rem;">{{ b.room.ward.name }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ b.get_status_display }}</span></td>
+                    <td style="padding: 0.75rem;">{{ b.last_cleaned_at|date:"M d, H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="padding: 1rem;" class="hs-text-muted">No beds registered.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
