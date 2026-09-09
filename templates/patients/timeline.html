@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Clinical Timeline - {{ patient.user.get_full_name }}{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Longitudinal Patient History Timeline</h1>
+    <p class="hs-text-muted">{{ patient.user.get_full_name }} | MRN: {{ patient.mrn }}</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-header">
+        <h3>Chronological Encounters & Vitals History</h3>
+    </div>
+    <div class="hs-card-body">
+        <ul style="list-style-type: none; padding-left: 1rem; border-left: 2px solid var(--hs-primary);">
+            {% for v in vitals %}
+            <li style="margin-bottom: 1.5rem; position: relative;">
+                <span style="position: absolute; left: -1.4rem; top: 0; background: var(--hs-primary); width: 10px; height: 10px; border-radius: 50%;"></span>
+                <strong>{{ v.recorded_at|date:"M d, Y - H:i" }}</strong>: 
+                Vitals Checked: BP {{ v.systolic_bp }}/{{ v.diastolic_bp }} mmHg, HR {{ v.heart_rate }} bpm, SpO2 {{ v.spo2_percentage }}%, Temp {{ v.temperature_celsius }}°C
+                {% if v.notes %}<br><small class="hs-text-muted">Note: {{ v.notes }}</small>{% endif %}
+            </li>
+            {% empty %}
+            <p class="hs-text-muted">No timeline entries found.</p>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

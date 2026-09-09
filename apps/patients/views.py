@@ -54,3 +54,9 @@ def record_vitals(request, patient_id):
     else:
         form = VitalSignForm()
     return render(request, 'patients/record_vitals.html', {'patient': patient, 'form': form})
+
+@login_required
+def clinical_timeline(request, patient_id):
+    patient = get_object_or_404(PatientProfile, id=patient_id)
+    vitals = patient.vital_signs.all().order_by('-recorded_at')[:20]
+    return render(request, 'patients/timeline.html', {'patient': patient, 'vitals': vitals})
