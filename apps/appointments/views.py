@@ -40,3 +40,18 @@ def book_appointment(request):
     else:
         form = AppointmentBookingForm()
     return render(request, 'appointments/book.html', {'form': form})
+
+@login_required
+def check_in_patient(request, appointment_id):
+    appt = get_object_or_404(Appointment, id=appointment_id)
+    appt.status = Appointment.Status.CHECKED_IN
+    appt.checked_in_at = timezone.now()
+    appt.save()
+    
+    # Generate token Q-101, Q-102 etc.
+    count = QueueTicket.objects.filter(issued_at__date=timezone.now().date()).count() + 1
+    token_str = f"Q-{count:03d}"
+    QueueTicket.objects.create(appointment=appt, token_number=token_str)
+    
+    messages.success(request, f"Patient {appt.patient.user.get_full_name()} checked in! Token: {token_str}")
+    return redirect('appointments:list')

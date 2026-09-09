@@ -45,3 +45,17 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Appt #{self.appointment_number} - {self.patient.user.get_full_name()} with Dr. {self.doctor.user.get_full_name()}"
+
+class QueueTicket(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name="queue_ticket")
+    token_number = models.CharField(max_length=16, unique=True, db_index=True)
+    issued_at = models.DateTimeField(default=timezone.now)
+    called_at = models.DateTimeField(null=True, blank=True)
+    is_served = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "hs_queue_tickets"
+
+    def __str__(self):
+        return f"Token #{self.token_number} - {self.appointment}"
