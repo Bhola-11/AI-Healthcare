@@ -146,3 +146,28 @@ class Bed(models.Model):
 
     def __str__(self):
         return f"Bed {self.bed_identifier} ({self.room.room_number}) - {self.status}"
+
+class OperatingHour(models.Model):
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name="operating_hours")
+    day_of_week = models.IntegerField(choices=[
+        (0, "Monday"), (1, "Tuesday"), (2, "Wednesday"), (3, "Thursday"),
+        (4, "Friday"), (5, "Saturday"), (6, "Sunday")
+    ])
+    opening_time = models.TimeField(default="08:00:00")
+    closing_time = models.TimeField(default="20:00:00")
+    is_24_hours = models.BooleanField(default=False)
+    is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "hs_facility_operating_hours"
+        unique_together = ("facility", "day_of_week")
+
+
+class FacilityHoliday(models.Model):
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name="holidays")
+    holiday_date = models.DateField()
+    description = models.CharField(max_length=255)
+    emergency_only = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "hs_facility_holidays"
