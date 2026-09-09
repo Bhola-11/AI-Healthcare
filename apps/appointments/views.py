@@ -70,3 +70,15 @@ def live_queue_board(request):
         'count': waiting_tickets.count(),
         'est_wait': avg_wait_minutes
     })
+
+@login_required
+def cancel_appointment(request, appointment_id):
+    appt = get_object_or_404(Appointment, id=appointment_id)
+    if request.method == 'POST':
+        reason = request.POST.get('cancellation_reason', 'Cancelled by user')
+        appt.status = Appointment.Status.CANCELLED
+        appt.cancellation_reason = reason
+        appt.save()
+        messages.warning(request, f"Appointment #{appt.appointment_number} has been cancelled.")
+        return redirect('appointments:list')
+    return render(request, 'appointments/cancel.html', {'appointment': appt})
