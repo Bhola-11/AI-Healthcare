@@ -31,3 +31,25 @@ class ClinicalTriageAssessment(models.Model):
 
     def __str__(self):
         return f"Triage #{self.id} for {self.patient} - {self.get_urgency_level_display()}"
+
+class DrugInteractionRule(models.Model):
+    class Severity(models.TextChoices):
+        CONTRAINDICATED = "CONTRAINDICATED", "Strictly Contraindicated (Severe Harm / Fatal)"
+        MAJOR = "MAJOR", "Major Interaction (Requires Doctor Override)"
+        MODERATE = "MODERATE", "Moderate (Clinical Monitoring Recommended)"
+        MINOR = "MINOR", "Minor Interaction"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    drug_a = models.CharField(max_length=150, db_index=True)
+    drug_b = models.CharField(max_length=150, db_index=True)
+    severity = models.CharField(max_length=32, choices=Severity.choices, default=Severity.MAJOR)
+    clinical_mechanism = models.TextField()
+    management_advice = models.TextField()
+    evidence_source = models.CharField(max_length=255, default="FDA Drug Safety Database / Micromedex")
+
+    class Meta:
+        db_table = "hs_ai_drug_interaction_rules"
+        unique_together = ("drug_a", "drug_b")
+
+    def __str__(self):
+        return f"{self.drug_a} + {self.drug_b} ({self.severity})"

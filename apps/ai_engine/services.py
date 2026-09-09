@@ -50,3 +50,27 @@ class TriageEngineService:
             pain_score=pain_score,
             recommended_disposition=disposition
         )
+
+from .models import DrugInteractionRule
+
+class DrugSafetyEngineService:
+    @staticmethod
+    def check_interaction(drug_a_name, drug_b_name):
+        rule = DrugInteractionRule.objects.filter(
+            models.Q(drug_a__iexact=drug_a_name, drug_b__iexact=drug_b_name) |
+            models.Q(drug_a__iexact=drug_b_name, drug_b__iexact=drug_a_name)
+        ).first()
+        return rule
+
+    @staticmethod
+    def screen_prescription_safety(patient, proposed_medication_name):
+        warnings = []
+        # Check patient allergies
+        for allergy in patient.allergies.filter(is_active=True):
+            if allergy.allergen_name.lower() in proposed_medication_name.lower():
+                warnings.append({
+                    "type": "ALLERGY_CONTRAINDICATION",
+                    "severity": "CRITICAL",
+                    "details": f"Patient has documented allergy to {allergy.allergen_name} ({allergy.get_severity_display()})."
+                })
+        return warnings
