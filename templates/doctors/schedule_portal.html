@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Clinician Schedule Portal - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Clinician Rostering & Leave Portal</h1>
+    <p class="hs-text-muted">Manage your practice hours, facility affiliations, and leave requests</p>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Active Weekly Rosters</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                {% for s in schedules %}
+                <li><strong>{{ s.get_day_of_week_display }}:</strong> {{ s.start_time|time:"H:i" }} - {{ s.end_time|time:"H:i" }} ({{ s.facility.name }})</li>
+                {% empty %}
+                <p class="hs-text-muted">No rosters configured.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Leave Requests</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                {% for l in leaves %}
+                <li>{{ l.start_date }} to {{ l.end_date }} - <span class="hs-user-badge">{{ l.get_status_display }}</span></li>
+                {% empty %}
+                <p class="hs-text-muted">No leave requests.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -18,3 +18,13 @@ def doctor_detail(request, doctor_id):
     schedules = doctor.schedules.filter(is_active=True).select_related('facility')
     specialties = doctor.specialties.select_related('specialty')
     return render(request, 'doctors/detail.html', {'doctor': doctor, 'schedules': schedules, 'specialties': specialties})
+
+@login_required
+def schedule_portal(request):
+    if not hasattr(request.user, 'doctor_profile'):
+        messages.error(request, "Only clinician accounts can access schedule management.")
+        return redirect('accounts:dashboard')
+    doctor = request.user.doctor_profile
+    schedules = doctor.schedules.all()
+    leaves = doctor.leaves.all()
+    return render(request, 'doctors/schedule_portal.html', {'doctor': doctor, 'schedules': schedules, 'leaves': leaves})
