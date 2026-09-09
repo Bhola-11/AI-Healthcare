@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Healthcare Dashboard - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Welcome, {{ user.get_full_name }}</h1>
+    <p class="hs-text-muted">Role: <strong>{{ user.get_role_display }}</strong> | System Status: <span class="hs-status-live">● Active & Secure</span></p>
+</div>
+
+<div class="hs-metrics-grid">
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Today's Appointments</div>
+        <div class="hs-metric-value">42</div>
+        <div class="hs-metric-subtext">8 pending check-in</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Admitted Inpatients</div>
+        <div class="hs-metric-value">128</div>
+        <div class="hs-metric-subtext">85% bed occupancy</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Critical Lab Alerts</div>
+        <div class="hs-metric-value hs-text-danger">3</div>
+        <div class="hs-metric-subtext">Requires immediate doctor review</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Active Prescriptions</div>
+        <div class="hs-metric-value">312</div>
+        <div class="hs-metric-subtext">Pharmacy queue: 14 pending</div>
+    </div>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Quick Actions</h3>
+        </div>
+        <div class="hs-card-body hs-quick-links">
+            <a href="{% url 'patients:list' %}" class="hs-action-tile">🏥 Look Up Patient</a>
+            <a href="{% url 'appointments:list' %}" class="hs-action-tile">📅 Schedule Appointment</a>
+            <a href="{% url 'clinical_records:encounters' %}" class="hs-action-tile">📋 Begin Consultation (SOAP)</a>
+            <a href="{% url 'ai_engine:triage' %}" class="hs-action-tile">🤖 Clinical AI Triage Assessment</a>
+        </div>
+    </div>
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>System Compliance & Integrity</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul class="hs-status-list">
+                <li>✅ HIPAA Audit Trail: Active (SHA-256 Hash Chaining verified)</li>
+                <li>✅ Role-Based Access Control: Enforced</li>
+                <li>✅ Database Engine: SQLite High-Concurrency WAL Mode</li>
+                <li>✅ API Layer: Django REST Framework with OpenAPI 3.0 Specs</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

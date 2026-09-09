@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Register Patient Account - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-auth-wrapper">
+    <div class="hs-card hs-auth-card">
+        <div class="hs-card-header text-center">
+            <h2>Patient Registration</h2>
+            <p class="hs-text-muted">Register to book appointments, view records and labs</p>
+        </div>
+        <div class="hs-card-body">
+            <form method="post" action="{% url 'accounts:register' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="hs-form-actions">
+                    <button type="submit" class="hs-btn hs-btn-primary hs-btn-block">Register Account</button>
+                </div>
+            </form>
+        </div>
+        <div class="hs-card-footer text-center">
+            <p>Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

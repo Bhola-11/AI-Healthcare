@@ -1,0 +1,19 @@
+<header class="hs-navbar">
+    <div class="hs-nav-brand">
+        <a href="{% url 'accounts:dashboard' %}" class="hs-brand-link">
+            <span class="hs-brand-icon">⚕</span>
+            <span class="hs-brand-text">HealthSphere</span>
+        </a>
+    </div>
+    <div class="hs-nav-actions">
+        {% if user.is_authenticated %}
+            <span class="hs-user-badge hs-badge-{{ current_user_role|lower }}">{{ user.get_role_display }}</span>
+            <span class="hs-user-name">{{ user.get_full_name }}</span>
+            <a href="{% url 'accounts:profile' %}" class="hs-nav-link">Profile</a>
+            <a href="{% url 'accounts:logout' %}" class="hs-btn hs-btn-outline-sm">Log Out</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}" class="hs-nav-link">Log In</a>
+            <a href="{% url 'accounts:register' %}" class="hs-btn hs-btn-primary-sm">Register Patient</a>
+        {% endif %}
+    </div>
+</header>
