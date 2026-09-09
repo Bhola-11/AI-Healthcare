@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Notifications - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-card">
+    <div class="hs-card-header">
+        <h2>Notifications & Alerts</h2>
+    </div>
+    <div class="hs-card-body">
+        {% if notifications %}
+            <div class="hs-notif-list">
+                {% for n in notifications %}
+                    <div class="hs-notif-item" style="padding: 1rem; border-bottom: 1px solid var(--hs-border);">
+                        <h4>{{ n.title }} <small class="hs-text-muted">({{ n.get_priority_display }})</small></h4>
+                        <p>{{ n.body }}</p>
+                        {% if not n.is_read %}
+                            <a href="{% url 'notifications:mark_read' n.id %}" class="hs-btn hs-btn-outline-sm mt-2">Mark Read</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="hs-text-muted">No notifications right now.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
