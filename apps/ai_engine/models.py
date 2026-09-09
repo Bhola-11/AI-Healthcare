@@ -72,3 +72,16 @@ class ClinicalRiskScoreLog(models.Model):
     class Meta:
         db_table = "hs_ai_risk_score_logs"
         ordering = ["-calculated_at"]
+
+class AIInferenceAuditLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    model_name = models.CharField(max_length=64)
+    input_payload = models.JSONField(default=dict)
+    output_payload = models.JSONField(default=dict)
+    is_overridden = models.BooleanField(default=False)
+    doctor_override_reason = models.TextField(blank=True)
+    latency_ms = models.PositiveIntegerField(default=12)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_ai_inference_audit_logs"

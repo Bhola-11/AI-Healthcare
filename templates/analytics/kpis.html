@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Executive Clinical & Operational KPIs - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Hospital Operational & Clinical Analytics</h1>
+    <p class="hs-text-muted">High-level executive metrics, patient flow, bed occupancy, and financial KPIs</p>
+</div>
+
+<div class="hs-metrics-grid mt-4">
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Active Patients</div>
+        <div class="hs-metric-value">{{ total_patients }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Bed Occupancy Rate</div>
+        <div class="hs-metric-value hs-status-live">{{ occ_rate }}%</div>
+        <div class="hs-metric-subtext">{{ occupied_beds }} of {{ total_beds }} beds occupied</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Total Invoiced Billing</div>
+        <div class="hs-metric-value">${{ total_invoiced }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Revenue Collected</div>
+        <div class="hs-metric-value hs-status-live">${{ total_collected }}</div>
+    </div>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Clinical Quality Indicators</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                <li><strong>Average Length of Stay (ALOS):</strong> 3.4 days</li>
+                <li><strong>30-Day Hospital Readmission Rate:</strong> 4.1% (Benchmark: &lt; 6.0%)</li>
+                <li><strong>Emergency Triage to Physician Time:</strong> 18 minutes</li>
+                <li><strong>Medication Reconciliation Compliance:</strong> 98.6%</li>
+            </ul>
+        </div>
+    </div>
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Payor Claim Realization Rate</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                <li><strong>First-Pass Clean Claim Ratio:</strong> 94.2%</li>
+                <li><strong>Denial Rejection Rate:</strong> 2.1%</li>
+                <li><strong>Average Days in Accounts Receivable (A/R):</strong> 28 days</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
