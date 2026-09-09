@@ -120,3 +120,23 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment #{self.payment_reference} (${self.amount}) for Invoice #{self.invoice.invoice_number}"
+
+class PatientLedgerEntry(models.Model):
+    class EntryType(models.TextChoices):
+        CHARGE = "CHARGE", "Debit / Patient Charge"
+        PAYMENT = "PAYMENT", "Credit / Payment Received"
+        INSURANCE_CREDIT = "INSURANCE_CREDIT", "Credit / Insurance Adjudication"
+        ADJUSTMENT = "ADJUSTMENT", "Administrative Waiver / Adjustment"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="ledger_entries")
+    entry_type = models.CharField(max_length=32, choices=EntryType.choices)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    running_balance = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.CharField(max_length=255)
+    reference_number = models.CharField(max_length=64, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_billing_patient_ledger"
+        ordering = ["created_at"]
