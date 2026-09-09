@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ facility.name }} - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>{{ facility.name }}</h1>
+    <p class="hs-text-muted">{{ facility.get_facility_type_display }} | Code: {{ facility.facility_code }} | License: {{ facility.license_number }}</p>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Facility Specifications</h3>
+        </div>
+        <div class="hs-card-body">
+            <p><strong>Address:</strong> {{ facility.address_line_1 }}, {{ facility.city }}, {{ facility.state }} {{ facility.postal_code }}</p>
+            <p><strong>Phone:</strong> {{ facility.phone }} | <strong>Email:</strong> {{ facility.email }}</p>
+            <p><strong>Emergency Trauma:</strong> {{ facility.get_trauma_level_display }}</p>
+            <p><strong>Bed Capacity:</strong> {{ facility.total_capacity }} licensed beds</p>
+        </div>
+    </div>
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Clinical Departments ({{ departments.count }})</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                {% for d in departments %}
+                <li style="margin-bottom: 0.5rem;">
+                    <strong>{{ d.name }}</strong> ({{ d.code }}) - Floor {{ d.floor_number }} [{{ d.get_category_display }}]
+                </li>
+                {% empty %}
+                <p class="hs-text-muted">No departments yet assigned.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

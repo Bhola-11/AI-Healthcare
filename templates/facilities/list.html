@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Healthcare Facilities Directory - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Healthcare Facilities</h1>
+            <p class="hs-text-muted">Multi-site institutional management across hospital networks</p>
+        </div>
+        <a href="{% url 'facilities:create' %}" class="hs-btn hs-btn-primary">+ Register Facility</a>
+    </div>
+</div>
+
+<div class="hs-metrics-grid">
+    {% for f in facilities %}
+    <div class="hs-metric-card">
+        <span class="hs-user-badge">{{ f.get_facility_type_display }}</span>
+        <h3 class="mt-2"><a href="{% url 'facilities:detail' f.id %}" style="text-decoration: none; color: inherit;">{{ f.name }}</a></h3>
+        <p class="hs-text-muted" style="font-size: 0.85rem;">{{ f.city }}, {{ f.state }}</p>
+        <p class="mt-2" style="font-size: 0.9rem;"><strong>Code:</strong> {{ f.facility_code }} | <strong>Beds:</strong> {{ f.total_capacity }}</p>
+        <div class="mt-3">
+            <a href="{% url 'facilities:detail' f.id %}" class="hs-btn hs-btn-outline-sm">View Departments & Wards</a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="hs-text-muted">No healthcare facilities configured.</p>
+    {% endfor %}
+</div>
+{% endblock %}
