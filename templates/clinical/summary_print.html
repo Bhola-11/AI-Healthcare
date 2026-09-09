@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clinical Encounter Summary - {{ encounter.encounter_number }}</title>
+    <style>
+        body { font-family: serif; margin: 2rem; color: #111; line-height: 1.5; }
+        .header { border-bottom: 2px solid #000; padding-bottom: 1rem; margin-bottom: 1.5rem; text-align: center; }
+        .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+        .meta-table td { padding: 0.4rem; border: 1px solid #ccc; }
+        .section-title { font-weight: bold; text-transform: uppercase; margin-top: 1rem; border-bottom: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>HEALTHSPHERE MEDICAL SYSTEM - OFFICIAL CLINICAL ENCOUNTER SUMMARY</h2>
+        <p>{{ encounter.facility.name }} | {{ encounter.facility.phone }}</p>
+    </div>
+    <table class="meta-table">
+        <tr>
+            <td><strong>Patient:</strong> {{ encounter.patient.user.get_full_name }}</td>
+            <td><strong>MRN:</strong> {{ encounter.patient.mrn }}</td>
+            <td><strong>DOB:</strong> {{ encounter.patient.date_of_birth }}</td>
+        </tr>
+        <tr>
+            <td><strong>Physician:</strong> Dr. {{ encounter.doctor.user.get_full_name }} (NPI: {{ encounter.doctor.npi_number }})</td>
+            <td><strong>Encounter Date:</strong> {{ encounter.start_time|date:"Y-m-d H:i" }}</td>
+            <td><strong>Status:</strong> {{ encounter.get_status_display }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">Subjective & Chief Complaint</div>
+    <p>{{ encounter.soap_note.subjective|linebreaksbr }}</p>
+
+    <div class="section-title">Objective Findings & Vitals</div>
+    <p>{{ encounter.soap_note.objective|linebreaksbr }}</p>
+
+    <div class="section-title">Clinical Assessment & Diagnoses</div>
+    <p>{{ encounter.soap_note.assessment|linebreaksbr }}</p>
+
+    <div class="section-title">Treatment Plan & Orders</div>
+    <p>{{ encounter.soap_note.plan|linebreaksbr }}</p>
+
+    <div style="margin-top: 3rem; display: flex; justify-content: space-between;">
+        <div>Electronically Verified: <strong>{% if encounter.soap_note.is_signed %}YES (SHA-256 Hash Verified){% else %}DRAFT PENDING SIGNATURE{% endif %}</strong></div>
+        <div>Physician Signature: ___________________________</div>
+    </div>
+</body>
+</html>
