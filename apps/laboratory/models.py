@@ -45,3 +45,21 @@ class LabTestCatalog(models.Model):
 
     def __str__(self):
         return f"{self.test_name} [{self.loinc_code}] ({self.measurement_unit})"
+
+class DemographicReferenceRange(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    test = models.ForeignKey(LabTestCatalog, on_delete=models.CASCADE, related_name="reference_ranges")
+    gender = models.CharField(max_length=16, choices=[("ALL", "All Genders"), ("MALE", "Male"), ("FEMALE", "Female")], default="ALL")
+    min_age_years = models.DecimalField(max_digits=4, decimal_places=1, default=0.0)
+    max_age_years = models.DecimalField(max_digits=4, decimal_places=1, default=120.0)
+    
+    normal_min = models.DecimalField(max_digits=10, decimal_places=3)
+    normal_max = models.DecimalField(max_digits=10, decimal_places=3)
+    critical_low = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    critical_high = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+
+    class Meta:
+        db_table = "hs_lab_reference_ranges"
+
+    def __str__(self):
+        return f"{self.test.test_name} Range ({self.gender}, {self.min_age_years}-{self.max_age_years}y): {self.normal_min} - {self.normal_max} {self.test.measurement_unit}"
