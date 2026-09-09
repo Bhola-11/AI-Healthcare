@@ -117,3 +117,29 @@ class EncounterDiagnosis(models.Model):
 
     def __str__(self):
         return f"{self.icd10.code} ({self.diagnosis_type}) - {self.encounter}"
+
+class ClinicalAttachment(models.Model):
+    class AttachmentType(models.TextChoices):
+        XRAY = "XRAY", "X-Ray Radiograph"
+        MRI = "MRI", "Magnetic Resonance Imaging (MRI)"
+        CT_SCAN = "CT_SCAN", "Computed Tomography (CT)"
+        ULTRASOUND = "ULTRASOUND", "Ultrasound Sonogram"
+        ECG = "ECG", "Electrocardiogram (ECG/EKG)"
+        LAB_SCAN = "LAB_SCAN", "Scanned Laboratory Report"
+        PATHOLOGY = "PATHOLOGY", "Histopathology Slide Image"
+        DISCHARGE_DOC = "DISCHARGE_DOC", "Discharge Summary Document"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    encounter = models.ForeignKey(Encounter, on_delete=models.CASCADE, related_name="attachments")
+    attachment_type = models.CharField(max_length=32, choices=AttachmentType.choices)
+    title = models.CharField(max_length=255)
+    file = models.FileField(upload_to="clinical_attachments/%Y/%m/")
+    mime_type = models.CharField(max_length=64, default="application/pdf")
+    file_size_bytes = models.PositiveBigIntegerField(default=0)
+    uploaded_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_clinical_attachments"
+
+    def __str__(self):
+        return f"{self.title} ({self.attachment_type}) - {self.encounter}"
