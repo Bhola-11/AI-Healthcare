@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Clinical AI Decision Support & Triage - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Clinical AI Decision Support & Emergency Triage</h1>
+    <p class="hs-text-muted">Manchester Triage System (MTS) and ESI 5-level algorithmic assessment</p>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <!-- Assessment Form -->
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>New Emergency Triage Evaluation</h3>
+        </div>
+        <div class="hs-card-body">
+            <form method="post">
+                {% csrf_token %}
+                <label>Select Patient:</label>
+                <select name="patient" class="form-select" required>
+                    {% for p in patients %}
+                    <option value="{{ p.id }}">{{ p.user.get_full_name }} ({{ p.mrn }})</option>
+                    {% endfor %}
+                </select>
+
+                <label class="mt-3">Chief Complaint / Presenting Symptoms:</label>
+                <input type="text" name="complaint" class="form-input" placeholder="e.g. Acute severe substernal chest pressure" required>
+
+                <label class="mt-3">Pain Score (0 - 10):</label>
+                <input type="number" name="pain_score" min="0" max="10" class="form-input" value="0">
+
+                <label class="mt-3">Clinical Red Flag Discriminator:</label>
+                <select name="red_flag" class="form-select">
+                    <option value="">None / Routine Observation</option>
+                    <option value="cardiac_arrest">Unresponsive / Sudden Collapse / Severe Shock (Level 1)</option>
+                    <option value="airway_compromise">Airway Compromise / Stridor (Level 1)</option>
+                    <option value="chest_pain_diaphoretic">Chest Pain with Diaphoresis / Suspected ACS (Level 2)</option>
+                    <option value="acute_stroke_signs">Acute Focal Neurological Deficit / Stroke (Level 2)</option>
+                    <option value="severe_respiratory_distress">Severe Respiratory Distress / Hypoxia (Level 2)</option>
+                    <option value="moderate_pain">Severe Pain / Uncontrolled Symptoms (Level 3)</option>
+                    <option value="minor_laceration">Minor Trauma / Ambulatory Injury (Level 4)</option>
+                    <option value="chronic_refill">Non-urgent Medication Refill (Level 5)</option>
+                </select>
+
+                <div class="hs-form-actions mt-4">
+                    <button type="submit" class="hs-btn hs-btn-primary">Execute AI Triage Analysis</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Assessments -->
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Recent Triage Assessments</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                {% for r in recent %}
+                <li style="margin-bottom: 0.75rem; border-bottom: 1px solid var(--hs-border); padding-bottom: 0.5rem;">
+                    <strong>{{ r.patient.user.get_full_name }}</strong>: 
+                    <span class="hs-user-badge {% if r.urgency_level <= 2 %}hs-badge-urgent{% endif %}">{{ r.get_urgency_level_display }}</span><br>
+                    <small>{{ r.presenting_complaint }} &rarr; <em>{{ r.recommended_disposition }}</em></small>
+                </li>
+                {% empty %}
+                <p class="hs-text-muted">No recent triage assessments.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
