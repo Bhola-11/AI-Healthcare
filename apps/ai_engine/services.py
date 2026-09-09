@@ -74,3 +74,38 @@ class DrugSafetyEngineService:
                     "details": f"Patient has documented allergy to {allergy.allergen_name} ({allergy.get_severity_display()})."
                 })
         return warnings
+
+from apps.clinical_records.models import ICD10DiagnosisCode
+
+class DiagnosticSuggestionService:
+    KEYWORD_MAP = {
+        "hypertension": ["I10"],
+        "high blood pressure": ["I10"],
+        "diabetes": ["E11.9"],
+        "hyperglycemia": ["E11.65"],
+        "asthma": ["J45.909"],
+        "wheezing": ["J45.909"],
+        "copd": ["J44.9"],
+        "pneumonia": ["J18.9"],
+        "fever": ["R50.9"],
+        "cough": ["R05"],
+        "back pain": ["M54.5"],
+        "chest pain": ["I25.10"],
+        "heart failure": ["I50.9"],
+        "gerd": ["K21.9"],
+        "acid reflux": ["K21.9"],
+        "anxiety": ["F41.1"],
+        "depression": ["F32.9"],
+    }
+
+    @classmethod
+    def suggest_diagnoses(cls, clinical_text):
+        if not clinical_text:
+            return []
+        text_lower = clinical_text.lower()
+        matched_codes = set()
+        for kw, codes in cls.KEYWORD_MAP.items():
+            if kw in text_lower:
+                matched_codes.update(codes)
+                
+        return list(ICD10DiagnosisCode.objects.filter(code__in=matched_codes))
