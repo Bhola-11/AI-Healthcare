@@ -94,3 +94,20 @@ class LabOrder(models.Model):
 
     def __str__(self):
         return f"LabOrder #{self.order_number} for {self.patient} ({self.status})"
+
+class LabSpecimen(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(LabOrder, on_delete=models.CASCADE, related_name="specimens")
+    specimen_type = models.ForeignKey(SpecimenType, on_delete=models.CASCADE)
+    barcode_id = models.CharField(max_length=64, unique=True, db_index=True)
+    collected_at = models.DateTimeField(default=timezone.now)
+    collected_by = models.CharField(max_length=255, default="Phlebotomy Staff")
+    storage_temperature = models.CharField(max_length=32, default="Refrigerated (2-8°C)")
+    is_rejected = models.BooleanField(default=False)
+    rejection_reason = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "hs_lab_specimens"
+
+    def __str__(self):
+        return f"Specimen [{self.barcode_id}] - {self.specimen_type.name}"
