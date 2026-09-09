@@ -97,3 +97,23 @@ class ICD10DiagnosisCode(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.description}"
+
+class EncounterDiagnosis(models.Model):
+    class DiagnosisType(models.TextChoices):
+        PRIMARY = "PRIMARY", "Primary / Principal Diagnosis"
+        SECONDARY = "SECONDARY", "Secondary Comorbidity"
+        DIFFERENTIAL = "DIFFERENTIAL", "Differential Working Diagnosis"
+        DISCHARGE = "DISCHARGE", "Final Discharge Diagnosis"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    encounter = models.ForeignKey(Encounter, on_delete=models.CASCADE, related_name="diagnoses")
+    icd10 = models.ForeignKey(ICD10DiagnosisCode, on_delete=models.CASCADE, related_name="encounter_diagnoses")
+    diagnosis_type = models.CharField(max_length=32, choices=DiagnosisType.choices, default=DiagnosisType.PRIMARY)
+    clinical_notes = models.TextField(blank=True)
+    recorded_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_encounter_diagnoses"
+
+    def __str__(self):
+        return f"{self.icd10.code} ({self.diagnosis_type}) - {self.encounter}"
