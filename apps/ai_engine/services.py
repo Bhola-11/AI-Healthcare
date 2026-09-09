@@ -109,3 +109,30 @@ class DiagnosticSuggestionService:
                 matched_codes.update(codes)
                 
         return list(ICD10DiagnosisCode.objects.filter(code__in=matched_codes))
+
+from .models import ClinicalRiskScoreLog
+
+class ClinicalRiskCalculatorService:
+    @staticmethod
+    def calculate_cardiovascular_risk(patient, systolic_bp, is_smoker=False, total_cholesterol=200):
+        # Framingham-inspired simplified baseline calculation
+        score = 0
+        if systolic_bp >= 160: score += 4
+        elif systolic_bp >= 140: score += 2
+        elif systolic_bp >= 130: score += 1
+        
+        if is_smoker: score += 3
+        if total_cholesterol > 240: score += 2
+        
+        cat = ClinicalRiskScoreLog.RiskCategory.LOW
+        if score >= 6: cat = ClinicalRiskScoreLog.RiskCategory.VERY_HIGH
+        elif score >= 4: cat = ClinicalRiskScoreLog.RiskCategory.HIGH
+        elif score >= 2: cat = ClinicalRiskScoreLog.RiskCategory.MODERATE
+        
+        return ClinicalRiskScoreLog.objects.create(
+            patient=patient,
+            score_name="ASCVD 10-Year Cardiovascular Risk",
+            calculated_score=score * 2.5,
+            risk_category=cat,
+            explanation=f"Calculated based on SBP {systolic_bp} mmHg, smoking: {is_smoker}, cholesterol: {total_cholesterol}."
+        )
