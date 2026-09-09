@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Laboratory & Diagnostic Orders - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Clinical Laboratory & Pathology Orders</h1>
+    <p class="hs-text-muted">Diagnostic test accessioning, analyzer telemetry, and pathologist verification</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Order #</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Ordering Physician</th>
+                    <th style="padding: 0.75rem;">Priority</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Ordered Date</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ o.order_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ o.patient.user.get_full_name }} ({{ o.patient.mrn }})</td>
+                    <td style="padding: 0.75rem;">Dr. {{ o.ordering_doctor.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ o.get_priority_display }}</span></td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ o.get_status_display }}</span></td>
+                    <td style="padding: 0.75rem;">{{ o.ordered_at|date:"M d, Y" }}</td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'laboratory:detail' o.id %}" class="hs-btn hs-btn-outline-sm">View Worksheet</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="padding: 1rem;" class="hs-text-muted">No lab orders found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

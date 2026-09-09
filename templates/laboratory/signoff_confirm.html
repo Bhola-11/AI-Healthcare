@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Verify Lab Order #{{ order.order_number }} - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-card" style="max-width: 600px; margin: 3rem auto;">
+    <div class="hs-card-header">
+        <h2>Pathologist Verification & Release</h2>
+    </div>
+    <div class="hs-card-body">
+        <p>I verify that all quality control calibration standards have been satisfied and authorize the release of diagnostic findings for <strong>Lab Order #{{ order.order_number }}</strong>.</p>
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="hs-form-actions">
+                <button type="submit" class="hs-btn" style="background: var(--hs-success); color: #fff;">Sign & Release Diagnostic Findings</button>
+                <a href="{% url 'laboratory:detail' order.id %}" class="hs-btn hs-btn-outline-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
