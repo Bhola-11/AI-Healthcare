@@ -26,3 +26,38 @@ class DoctorProfile(models.Model):
 
     def __str__(self):
         return f"Dr. {self.user.get_full_name()} (NPI: {self.npi_number})"
+
+class Specialty(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, unique=True)
+    code = models.CharField(max_length=32, unique=True)
+    description = models.TextField(blank=True)
+    board_name = models.CharField(max_length=255, default="American Board of Medical Specialties")
+
+    class Meta:
+        db_table = "hs_medical_specialties"
+        verbose_name_plural = "Specialties"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class DoctorSpecialty(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="specialties")
+    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name="doctors")
+    is_primary = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "hs_doctor_specialty_mappings"
+        unique_together = ("doctor", "specialty")
+
+
+class DoctorQualification(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="qualifications")
+    degree_name = models.CharField(max_length=128)
+    institution = models.CharField(max_length=255)
+    graduation_year = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = "hs_doctor_qualifications"
