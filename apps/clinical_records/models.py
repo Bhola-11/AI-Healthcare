@@ -81,3 +81,19 @@ class SOAPNote(models.Model):
         self.is_signed = True
         self.signed_at = timezone.now()
         self.save()
+
+class ICD10DiagnosisCode(models.Model):
+    code = models.CharField(max_length=16, primary_key=True, db_index=True)
+    description = models.CharField(max_length=512, db_index=True)
+    chapter_number = models.PositiveIntegerField(default=1)
+    chapter_title = models.CharField(max_length=255)
+    category_code = models.CharField(max_length=16, db_index=True)
+    is_billable = models.BooleanField(default=True)
+    is_chronic = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "hs_icd10_diagnosis_codes"
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
