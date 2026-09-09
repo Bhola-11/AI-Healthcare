@@ -82,3 +82,25 @@ class DoctorSchedule(models.Model):
 
     def __str__(self):
         return f"{self.doctor} - {self.get_day_of_week_display()} ({self.start_time}-{self.end_time})"
+
+class DoctorLeave(models.Model):
+    class LeaveStatus(models.TextChoices):
+        PENDING = "PENDING", "Pending Medical Director Approval"
+        APPROVED = "APPROVED", "Approved"
+        REJECTED = "REJECTED", "Rejected"
+        CANCELLED = "CANCELLED", "Cancelled"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="leaves")
+    start_date = models.DateField()
+    end_date = models.DateField()
+    reason = models.CharField(max_length=255)
+    status = models.CharField(max_length=32, choices=LeaveStatus.choices, default=LeaveStatus.PENDING)
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="approved_leaves")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_doctor_leaves"
+
+    def __str__(self):
+        return f"{self.doctor} Leave ({self.start_date} to {self.end_date}) - {self.status}"
