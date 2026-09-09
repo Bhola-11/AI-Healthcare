@@ -65,3 +65,30 @@ class EmergencyContact(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.relationship}) - {self.phone_number}"
+
+class Allergy(models.Model):
+    class AllergenCategory(models.TextChoices):
+        MEDICATION = "MEDICATION", "Medication / Pharmacology"
+        FOOD = "FOOD", "Food Allergen"
+        ENVIRONMENTAL = "ENVIRONMENTAL", "Environmental / Seasonal"
+        BIOLOGICAL = "BIOLOGICAL", "Latex / Biological Product"
+
+    class Severity(models.TextChoices):
+        MILD = "MILD", "Mild (Rash, Itching)"
+        MODERATE = "MODERATE", "Moderate (Hives, Facial Swelling)"
+        SEVERE = "SEVERE", "Severe Anaphylaxis (Airway Compromise)"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="allergies")
+    allergen_name = models.CharField(max_length=150, db_index=True)
+    category = models.CharField(max_length=32, choices=AllergenCategory.choices, default=AllergenCategory.MEDICATION)
+    severity = models.CharField(max_length=32, choices=Severity.choices, default=Severity.MODERATE)
+    reaction_description = models.TextField()
+    diagnosed_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "hs_patient_allergies"
+
+    def __str__(self):
+        return f"{self.allergen_name} ({self.severity}) - {self.patient}"
