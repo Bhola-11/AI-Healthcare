@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Official Diagnostic Laboratory Report - #{{ order.order_number }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; color: #111; }
+        .lab-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .res-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        .res-table th, .res-table td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        .res-table th { background: #f0f4f8; }
+        .flag-critical { color: #dc2626; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="lab-header">
+        <h2>HEALTHSPHERE CLINICAL LABORATORIES & PATHOLOGY SERVICES</h2>
+        <p>Accredited by College of American Pathologists (CAP) & CLIA Certified</p>
+    </div>
+    
+    <div class="meta-grid">
+        <div>
+            <p><strong>Patient Name:</strong> {{ order.patient.user.get_full_name }}</p>
+            <p><strong>MRN:</strong> {{ order.patient.mrn }}</p>
+            <p><strong>DOB:</strong> {{ order.patient.date_of_birth }}</p>
+        </div>
+        <div>
+            <p><strong>Order #:</strong> {{ order.order_number }}</p>
+            <p><strong>Ordering MD:</strong> Dr. {{ order.ordering_doctor.user.get_full_name }}</p>
+            <p><strong>Reported Date:</strong> {{ order.completed_at|default:order.ordered_at|date:"Y-m-d H:i" }}</p>
+        </div>
+    </div>
+
+    <table class="res-table">
+        <thead>
+            <tr>
+                <th>Test Parameter</th>
+                <th>LOINC</th>
+                <th>Observed Value</th>
+                <th>Units</th>
+                <th>Reference Range</th>
+                <th>Flag</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td><strong>{{ r.test.test_name }}</strong></td>
+                <td>{{ r.test.loinc_code }}</td>
+                <td><strong>{{ r.observed_numeric_value|default:r.observed_text_value }}</strong></td>
+                <td>{{ r.test.measurement_unit }}</td>
+                <td>{{ r.reference_range_used|default:"Normal" }}</td>
+                <td class="{% if 'CRITICAL' in r.flag %}flag-critical{% endif %}">{{ r.get_flag_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 3rem; text-align: right;">
+        <p>Verified Electronically by Consulting Pathologist</p>
+        <p><strong>HealthSphere Pathology Directorate</strong></p>
+    </div>
+</body>
+</html>
