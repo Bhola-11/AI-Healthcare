@@ -1,4 +1,4 @@
-﻿"""
+"""
 Root URL Configuration for HealthSphere.
 """
 from django.contrib import admin
@@ -23,6 +23,7 @@ urlpatterns = [
     path('notifications/', include('apps.notifications.urls', namespace='notifications')),
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),
     path('ai/', include('apps.ai_engine.urls', namespace='ai_engine')),
+    path('audit/', include('apps.audit.urls', namespace='audit')),
     path('api/', include('apps.api.urls', namespace='api')),
     
     # OpenAPI Documentation

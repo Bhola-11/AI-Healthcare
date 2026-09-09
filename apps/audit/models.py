@@ -19,6 +19,8 @@ class AuditLog(models.Model):
         DISPENSE = "DISPENSE", "Medication Dispensed"
         OVERRIDE = "OVERRIDE", "Clinical Alert Overridden"
 
+    Action = ActionType
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     actor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
     actor_email = models.EmailField(blank=True)
@@ -39,7 +41,7 @@ class AuditLog(models.Model):
         ordering = ["-timestamp"]
 
     def calculate_hash(self):
-        payload = f"{self.id}:{self.actor_email}:{self.action}:{self.target_model}:{self.target_id}:{self.timestamp.isoformat()}:{self.previous_hash}"
+        payload = f"{self.id}:{self.actor_email}:{self.action}:{self.target_model}:{self.target_id}:{self.timestamp.isoformat()}:{json.dumps(self.changes_json, sort_keys=True)}:{self.previous_hash}"
         return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
     def save(self, *args, **kwargs):

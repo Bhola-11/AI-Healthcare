@@ -43,3 +43,30 @@ class AuditService:
                 violations.append((log.id, f"Invalid hash: {log.integrity_hash} vs computed {computed}"))
             expected_prev = log.integrity_hash
         return len(violations) == 0, violations
+
+    @classmethod
+    def verify_chain_integrity(cls):
+        valid, violations = cls.verify_trail_integrity()
+        total = AuditLog.objects.count()
+        first_tampered = violations[0][0] if violations else None
+        return {
+            "is_valid": valid,
+            "total_nodes": total,
+            "tampered_record_id": first_tampered,
+            "violations": violations
+        }
+
+    @classmethod
+    def log_action(cls, actor, action, resource, description="", changes=None, request=None):
+        target_model = resource.__class__.__name__ if resource else ""
+        target_id = str(getattr(resource, "id", getattr(resource, "pk", "")))
+        desc = description or f"{action} performed on {target_model} #{target_id}"
+        return cls.log_event(
+            action=action,
+            description=desc,
+            actor=actor,
+            target_model=target_model,
+            target_id=target_id,
+            changes=changes,
+            request=request
+        )
