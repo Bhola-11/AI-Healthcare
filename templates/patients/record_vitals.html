@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Record Vitals - {{ patient.user.get_full_name }}{% endblock %}
+{% block content %}
+<div class="hs-card" style="max-width: 700px; margin: 0 auto;">
+    <div class="hs-card-header">
+        <h2>Record Vitals: {{ patient.user.get_full_name }} ({{ patient.mrn }})</h2>
+    </div>
+    <div class="hs-card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="hs-form-grid">
+                {{ form.as_p }}
+            </div>
+            <div class="hs-form-actions mt-4">
+                <button type="submit" class="hs-btn hs-btn-primary">Save Vitals</button>
+                <a href="{% url 'patients:detail' patient.id %}" class="hs-btn hs-btn-outline-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

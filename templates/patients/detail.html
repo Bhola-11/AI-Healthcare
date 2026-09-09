@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}{{ patient.user.get_full_name }} ({{ patient.mrn }}) - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ patient.user.get_full_name }}</h1>
+            <p class="hs-text-muted">MRN: <strong>{{ patient.mrn }}</strong> | Blood: <strong>{{ patient.blood_group }}</strong> | Gender: {{ patient.get_gender_display }}</p>
+        </div>
+        <a href="{% url 'patients:record_vitals' patient.id %}" class="hs-btn hs-btn-primary">+ Record Vitals</a>
+    </div>
+</div>
+
+<div class="hs-metrics-grid mt-4">
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Active Allergies</div>
+        <div class="hs-metric-value {% if allergies.count > 0 %}hs-text-danger{% endif %}">{{ allergies.count }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Chronic Conditions</div>
+        <div class="hs-metric-value">{{ history.count }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Past Surgeries</div>
+        <div class="hs-metric-value">{{ surgeries.count }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Latest Blood Pressure</div>
+        <div class="hs-metric-value hs-status-live">{% if vitals.first %}{{ vitals.first.systolic_bp }}/{{ vitals.first.diastolic_bp }}{% else %}N/A{% endif %}</div>
+    </div>
+</div>
+
+<div class="hs-grid-two-column mt-4">
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Recent Physiological Vital Signs</h3>
+        </div>
+        <div class="hs-card-body">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--hs-border); font-size: 0.85rem; text-align: left;">
+                        <th style="padding: 0.5rem;">Date</th>
+                        <th style="padding: 0.5rem;">BP</th>
+                        <th style="padding: 0.5rem;">Pulse</th>
+                        <th style="padding: 0.5rem;">SpO2</th>
+                        <th style="padding: 0.5rem;">BMI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vitals %}
+                    <tr style="border-bottom: 1px solid var(--hs-border); font-size: 0.85rem;">
+                        <td style="padding: 0.5rem;">{{ v.recorded_at|date:"M d, H:i" }}</td>
+                        <td style="padding: 0.5rem;">{{ v.systolic_bp }}/{{ v.diastolic_bp }}</td>
+                        <td style="padding: 0.5rem;">{{ v.heart_rate }} bpm</td>
+                        <td style="padding: 0.5rem;">{{ v.spo2_percentage }}%</td>
+                        <td style="padding: 0.5rem;">{{ v.bmi|default:"--" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="hs-text-muted" style="padding: 0.5rem;">No vitals recorded.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h3>Allergies & Adverse Reactions</h3>
+        </div>
+        <div class="hs-card-body">
+            <ul>
+                {% for a in allergies %}
+                <li style="margin-bottom: 0.5rem;">
+                    <strong>{{ a.allergen_name }}</strong> <span class="hs-user-badge">{{ a.get_severity_display }}</span><br>
+                    <small class="hs-text-muted">{{ a.reaction_description }}</small>
+                </li>
+                {% empty %}
+                <p class="hs-text-muted">No known drug or food allergies (NKDA).</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

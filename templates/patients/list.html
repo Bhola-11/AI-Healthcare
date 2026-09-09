@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Patient Master Registry - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Patient Master Registry</h1>
+    <p class="hs-text-muted">Search and manage clinical records, vitals, and longitudinal charts</p>
+</div>
+
+<div class="hs-card mt-3">
+    <div class="hs-card-body">
+        <form method="get" style="display: flex; gap: 1rem; align-items: center;">
+            <div style="flex: 2;">{{ form.query }}</div>
+            <div style="flex: 1;">{{ form.blood_group }}</div>
+            <button type="submit" class="hs-btn hs-btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">MRN</th>
+                    <th style="padding: 0.75rem;">Patient Name</th>
+                    <th style="padding: 0.75rem;">Gender</th>
+                    <th style="padding: 0.75rem;">Blood Group</th>
+                    <th style="padding: 0.75rem;">Email</th>
+                    <th style="padding: 0.75rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ p.mrn }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ p.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">{{ p.get_gender_display }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ p.blood_group }}</span></td>
+                    <td style="padding: 0.75rem;">{{ p.user.email }}</td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'patients:detail' p.id %}" class="hs-btn hs-btn-outline-sm">Chart / EMR</a>
+                        <a href="{% url 'patients:record_vitals' p.id %}" class="hs-btn hs-btn-primary-sm">+ Vitals</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 1rem;" class="hs-text-muted">No patient records found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
