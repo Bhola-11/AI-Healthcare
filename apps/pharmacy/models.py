@@ -77,3 +77,22 @@ class DispensationRecord(models.Model):
 
     class Meta:
         db_table = "hs_pharmacy_dispensations"
+
+class StockAdjustment(models.Model):
+    class Reason(models.TextChoices):
+        REPLENISHMENT = "REPLENISHMENT", "Supplier Purchase Restock"
+        EXPIRED = "EXPIRED", "Expired Product Disposal"
+        DAMAGED = "DAMAGED", "Damaged / Broken Packaging"
+        INVENTORY_AUDIT = "INVENTORY_AUDIT", "Physical Inventory Audit Adjustment"
+        RECALL = "RECALL", "FDA / Manufacturer Product Recall"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    batch = models.ForeignKey(BatchInventory, on_delete=models.CASCADE, related_name="adjustments")
+    quantity_adjusted = models.IntegerField(help_text="Positive for addition, negative for deduction")
+    reason = models.CharField(max_length=32, choices=Reason.choices)
+    performed_by = models.CharField(max_length=255)
+    adjusted_at = models.DateTimeField(default=timezone.now)
+    reference_order_number = models.CharField(max_length=64, blank=True)
+
+    class Meta:
+        db_table = "hs_pharmacy_adjustments"
