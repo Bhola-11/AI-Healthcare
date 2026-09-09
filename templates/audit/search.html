@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}HIPAA Compliance Audit Ledger & Tamper Verification - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1>HIPAA Security Rule Compliance Audit Ledger</h1>
+            <p class="hs-text-muted">Cryptographically chained tamper-evident access and alteration log</p>
+        </div>
+        <div>
+            <a href="{% url 'audit:export_csv' %}" class="hs-btn hs-btn-outline">Export Audit CSV (HIPAA)</a>
+        </div>
+    </div>
+</div>
+
+<div class="hs-metric-card mt-4" style="display:flex; align-items:center; justify-content:space-between;">
+    <div>
+        <strong>Cryptographic Hash-Chain Integrity Status:</strong>
+        {% if tamper_status.is_valid %}
+        <span class="hs-status-live" style="margin-left: 1rem;">&#10004; INTEGRITY VERIFIED (0 Tampered Nodes)</span>
+        {% else %}
+        <span class="hs-status-urgent" style="margin-left: 1rem;">&#9888; TAMPERING DETECTED at Record {{ tamper_status.tampered_record_id }}</span>
+        {% endif %}
+    </div>
+    <div class="hs-text-muted">Checked {{ tamper_status.total_nodes }} Block Nodes</div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <form method="get" style="display:flex; gap:1rem; align-items:center;">
+            <input type="text" name="q" class="form-input" placeholder="Filter by resource (e.g. PatientProfile, Encounter)" value="{{ query }}">
+            <select name="action" class="form-select" style="width:200px;">
+                <option value="">All Actions</option>
+                {% for code, label in action_choices %}
+                <option value="{{ code }}" {% if action == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="hs-btn hs-btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+<div class="hs-table-container mt-4">
+    <table class="hs-table">
+        <thead>
+            <tr>
+                <th>Timestamp (UTC)</th>
+                <th>Actor</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Status</th>
+                <th>Chained Hash (SHA-256)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td><small>{{ log.created_at|date:"Y-m-d H:i:s" }}</small></td>
+                <td><strong>{{ log.actor.email|default:"SYSTEM" }}</strong></td>
+                <td><span class="hs-user-badge">{{ log.get_action_display }}</span></td>
+                <td>{{ log.resource_type }}:{{ log.resource_id|truncatechars:8 }}</td>
+                <td>{{ log.status }}</td>
+                <td><code>{{ log.tamper_evident_hash|slice:":16" }}...</code></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="hs-text-muted text-center">No audit records matching query.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
