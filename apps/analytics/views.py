@@ -25,3 +25,15 @@ def analytics_kpis(request):
         'total_invoiced': total_invoiced,
         'total_collected': total_collected
     })
+
+from apps.pharmacy.models import BatchInventory, Medication, DispensationRecord
+
+class PharmacyAnalyticsService:
+    @staticmethod
+    def get_top_dispensed_medications(limit=5):
+        return DispensationRecord.objects.all()[:limit]
+
+    @staticmethod
+    def get_inventory_valuation():
+        batches = BatchInventory.objects.all()
+        return sum(b.quantity_on_hand * b.cost_per_unit for b in batches)
