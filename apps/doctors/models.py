@@ -104,3 +104,19 @@ class DoctorLeave(models.Model):
 
     def __str__(self):
         return f"{self.doctor} Leave ({self.start_date} to {self.end_date}) - {self.status}"
+
+class DoctorFeeSchedule(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="fee_schedules")
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name="doctor_fees")
+    consultation_type = models.CharField(max_length=32, choices=[
+        ("IN_PERSON_GENERAL", "In-Person General Consultation"),
+        ("IN_PERSON_FOLLOWUP", "In-Person Follow-up"),
+        ("TELEHEALTH", "Telehealth Video Consultation"),
+        ("EMERGENCY_ON_CALL", "Emergency On-Call Consultation")
+    ], default="IN_PERSON_GENERAL")
+    fee_amount = models.DecimalField(max_digits=10, decimal_places=2, default=150.00)
+    effective_from = models.DateField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_doctor_fee_schedules"
+        unique_together = ("doctor", "facility", "consultation_type")
