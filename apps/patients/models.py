@@ -128,3 +128,39 @@ class FamilyHistory(models.Model):
 
     class Meta:
         db_table = "hs_patient_family_history"
+
+class VitalSign(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="vital_signs")
+    systolic_bp = models.PositiveIntegerField(help_text="mmHg")
+    diastolic_bp = models.PositiveIntegerField(help_text="mmHg")
+    heart_rate = models.PositiveIntegerField(help_text="beats per minute")
+    respiratory_rate = models.PositiveIntegerField(help_text="breaths per minute", default=16)
+    temperature_celsius = models.DecimalField(max_digits=4, decimal_places=1, default=37.0)
+    spo2_percentage = models.PositiveIntegerField(help_text="SpO2 percentage (0-100)", default=98)
+    weight_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    height_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    bmi = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
+    recorded_at = models.DateTimeField(default=timezone.now, db_index=True)
+    notes = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        db_table = "hs_patient_vitals"
+        ordering = ["-recorded_at"]
+
+    def calculate_bmi(self):
+        if self.weight_kg and self.height_cm and self.height_cm > 0:
+            h_m = float(self.height_cm) / 100.0
+            return round(float(self.weight_kg) / (h_m * h_m), 1)
+        return None
+
+    def calculate_mean_arterial_pressure(self):
+        return round((2 * self.diastolic_bp + self.systolic_bp) / 3.0, 1)
+
+    def save(self, *args, **kwargs):
+        if not self.bmi:
+            self.bmi = self.calculate_bmi()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"BP {self.systolic_bp}/{self.diastolic_bp} HR {self.heart_rate} SpO2 {self.spo2_percentage}% ({self.recorded_at.strftime('%Y-%m-%d %H:%M')})"
