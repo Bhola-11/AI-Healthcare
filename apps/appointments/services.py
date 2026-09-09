@@ -30,3 +30,30 @@ class AppointmentBookingService:
             status=Appointment.Status.SCHEDULED
         )
         return appointment
+
+from apps.notifications.services import NotificationService
+from apps.notifications.models import Notification
+
+class AppointmentReminderService:
+    @staticmethod
+    def dispatch_confirmation(appointment):
+        NotificationService.send(
+            recipient=appointment.patient.user,
+            title="Appointment Confirmed",
+            body=f"Your visit #{appointment.appointment_number} with Dr. {appointment.doctor.user.get_full_name()} is scheduled for {appointment.scheduled_datetime.strftime('%Y-%m-%d %H:%M')}.",
+            channel=Notification.Channel.IN_APP,
+            priority=Notification.Priority.IMPORTANT
+        )
+
+    @staticmethod
+    def dispatch_upcoming_reminders():
+        # Dispatch 24hr reminders for active scheduled visits
+        upcoming = Appointment.objects.filter(status=Appointment.Status.SCHEDULED)
+        for appt in upcoming[:50]:
+            NotificationService.send(
+                recipient=appt.patient.user,
+                title="Upcoming Appointment Reminder",
+                body=f"Reminder: Visit #{appt.appointment_number} with Dr. {appt.doctor.user.get_full_name()} at {appt.facility.name}.",
+                channel=Notification.Channel.IN_APP,
+                priority=Notification.Priority.ROUTINE
+            )
