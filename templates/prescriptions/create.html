@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Issue Electronic Prescription - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="hs-card-header">
+        <h2>Issue Digital E-Prescription</h2>
+    </div>
+    <div class="hs-card-body">
+        <form method="post">
+            {% csrf_token %}
+            <h3>1. Patient & Prescription Header</h3>
+            {{ form.as_p }}
+            
+            <h3 class="mt-4">2. Medication Item Details</h3>
+            {{ item_form.as_p }}
+
+            <div class="hs-form-actions mt-4">
+                <button type="submit" class="hs-btn hs-btn-primary">Sign & Issue Prescription</button>
+                <a href="{% url 'prescriptions:list' %}" class="hs-btn hs-btn-outline-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
