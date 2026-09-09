@@ -9,6 +9,9 @@ class AIEngineTestCase(TestCase):
         self.user = User.objects.create_user(email="pat.ai@test.org", password="Pass123!", role=User.Role.PATIENT)
         self.patient = PatientProfile.objects.create(user=self.user)
         Allergy.objects.create(patient=self.patient, allergen_name="Penicillin", reaction_description="Severe hives")
+        from apps.clinical_records.models import ICD10DiagnosisCode
+        ICD10DiagnosisCode.objects.get_or_create(code="I10", defaults={"description": "Essential (primary) hypertension"})
+        ICD10DiagnosisCode.objects.get_or_create(code="J45.909", defaults={"description": "Unspecified asthma, uncomplicated"})
         DrugInteractionRule.objects.create(
             drug_a="Warfarin",
             drug_b="Aspirin",
