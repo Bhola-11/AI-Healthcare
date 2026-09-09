@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Master Clinic Calendar - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Clinical Appointment Calendar</h1>
+    <p class="hs-text-muted">Physician roster and outpatient consultation schedule</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-header">
+        <h3>Upcoming Scheduled Encounters</h3>
+    </div>
+    <div class="hs-card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+            {% for a in appointments %}
+            <div style="padding: 1rem; border: 1px solid var(--hs-border); border-left: 4px solid var(--hs-primary); border-radius: 6px;">
+                <h4>{{ a.scheduled_datetime|date:"M d, H:i" }}</h4>
+                <p><strong>Patient:</strong> {{ a.patient.user.get_full_name }}</p>
+                <p><strong>Doctor:</strong> Dr. {{ a.doctor.user.get_full_name }}</p>
+                <p class="hs-text-muted" style="font-size: 0.85rem;">{{ a.facility.name }} ({{ a.get_consultation_type_display }})</p>
+            </div>
+            {% empty %}
+            <p class="hs-text-muted">No appointments on calendar.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
