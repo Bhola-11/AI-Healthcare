@@ -111,3 +111,48 @@ class LabSpecimen(models.Model):
 
     def __str__(self):
         return f"Specimen [{self.barcode_id}] - {self.specimen_type.name}"
+
+class LabResultItem(models.Model):
+    class Flag(models.TextChoices):
+        NORMAL = "NORMAL", "Normal Value"
+        HIGH = "HIGH", "Abnormally Elevated"
+        LOW = "LOW", "Abnormally Decreased"
+        CRITICAL_HIGH = "CRITICAL_HIGH", "Panic / Critical High Alert"
+        CRITICAL_LOW = "CRITICAL_LOW", "Panic / Critical Low Alert"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(LabOrder, on_delete=models.CASCADE, related_name="results")
+    test = models.ForeignKey(LabTestCatalog, on_delete=models.CASCADE, related_name="results")
+    observed_numeric_value = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    observed_text_value = models.CharField(max_length=255, blank=True)
+    flag = models.CharField(max_length=32, choices=Flag.choices, default=Flag.NORMAL)
+    reference_range_used = models.CharField(max_length=128, blank=True)
+    technician_notes = models.CharField(max_length=255, blank=True)
+    verified_by = models.CharField(max_length=255, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "hs_lab_result_items"
+
+    def calculate_flag(self, age_years=35, gender="ALL"):
+        ref = self.test.reference_ranges.filter(min_age_years__lte=age_years, max_age_years__gte=age_years).first()
+        if ref and self.observed_numeric_value is not None:
+            val = self.observed_numeric_value
+            if ref.critical_high and val >= ref.critical_high:
+                return self.Flag.CRITICAL_HIGH
+            if ref.critical_low and val <= ref.critical_low:
+                return self.Flag.CRITICAL_LOW
+            if val > ref.normal_max:
+                return self.Flag.HIGH
+            if val < ref.normal_min:
+                return self.Flag.LOW
+            return self.Flag.NORMAL
+        return self.Flag.NORMAL
+
+    def save(self, *args, **kwargs):
+        if self.observed_numeric_value is not None and not self.flag:
+            self.flag = self.calculate_flag()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.test.test_name}: {self.observed_numeric_value or self.observed_text_value} {self.test.measurement_unit} ({self.flag})"
