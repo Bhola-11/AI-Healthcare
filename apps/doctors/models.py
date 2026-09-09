@@ -61,3 +61,24 @@ class DoctorQualification(models.Model):
 
     class Meta:
         db_table = "hs_doctor_qualifications"
+
+class DoctorSchedule(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="schedules")
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name="doctor_schedules")
+    day_of_week = models.IntegerField(choices=[
+        (0, "Monday"), (1, "Tuesday"), (2, "Wednesday"), (3, "Thursday"),
+        (4, "Friday"), (5, "Saturday"), (6, "Sunday")
+    ])
+    start_time = models.TimeField(default="09:00:00")
+    end_time = models.TimeField(default="17:00:00")
+    slot_duration_minutes = models.PositiveIntegerField(default=30)
+    max_patients_per_slot = models.PositiveIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "hs_doctor_schedules"
+        unique_together = ("doctor", "facility", "day_of_week")
+
+    def __str__(self):
+        return f"{self.doctor} - {self.get_day_of_week_display()} ({self.start_time}-{self.end_time})"
