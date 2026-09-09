@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Clinicians & Specialists Directory - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Physicians & Specialists Directory</h1>
+    <p class="hs-text-muted">Credentialed medical staff across all healthcare facilities</p>
+</div>
+
+<div class="hs-card mt-3">
+    <div class="hs-card-body">
+        <form method="get" style="display: flex; gap: 1rem;">
+            <select name="specialty" class="form-select" style="max-width: 300px;">
+                <option value="">All Specialties</option>
+                {% for s in specialties %}
+                <option value="{{ s.code }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="hs-btn hs-btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+<div class="hs-metrics-grid mt-4">
+    {% for d in doctors %}
+    <div class="hs-metric-card">
+        <span class="hs-user-badge">Physician</span>
+        <h3 class="mt-2"><a href="{% url 'doctors:detail' d.id %}" style="text-decoration: none; color: inherit;">Dr. {{ d.user.get_full_name }}</a></h3>
+        <p class="hs-text-muted" style="font-size: 0.85rem;">NPI: {{ d.npi_number }} | Exp: {{ d.years_of_experience }} yrs</p>
+        <p class="mt-2" style="font-size: 0.9rem;"><strong>Fee:</strong> ${{ d.default_consultation_fee }} | <strong>Telehealth:</strong> {% if d.is_telehealth_enabled %}Yes{% else %}No{% endif %}</p>
+        <div class="mt-3">
+            <a href="{% url 'doctors:detail' d.id %}" class="hs-btn hs-btn-outline-sm">View Profile & Schedule</a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="hs-text-muted">No clinicians found.</p>
+    {% endfor %}
+</div>
+{% endblock %}
