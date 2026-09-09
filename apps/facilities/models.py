@@ -52,3 +52,32 @@ class Facility(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.facility_code}) - {self.get_facility_type_display()}"
+
+class Department(models.Model):
+    class DepartmentCategory(models.TextChoices):
+        CLINICAL = "CLINICAL", "Clinical Specialty"
+        DIAGNOSTIC = "DIAGNOSTIC", "Diagnostic & Laboratory"
+        SURGICAL = "SURGICAL", "Surgery & Operation Theater"
+        EMERGENCY = "EMERGENCY", "Emergency & Critical Care"
+        ADMINISTRATIVE = "ADMINISTRATIVE", "Administrative & Support"
+        PHARMACY = "PHARMACY", "Pharmacy & Therapeutics"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name="departments")
+    name = models.CharField(max_length=150)
+    code = models.CharField(max_length=32)
+    category = models.CharField(max_length=32, choices=DepartmentCategory.choices, default=DepartmentCategory.CLINICAL)
+    head_of_department = models.CharField(max_length=255, blank=True)
+    contact_extension = models.CharField(max_length=16, blank=True)
+    floor_number = models.CharField(max_length=16, default="1")
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_facility_departments"
+        unique_together = ("facility", "code")
+        ordering = ["facility", "name"]
+
+    def __str__(self):
+        return f"{self.name} - {self.facility.name} ({self.code})"
