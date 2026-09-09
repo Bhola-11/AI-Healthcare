@@ -47,3 +47,38 @@ class PatientInsurancePolicy(models.Model):
 
     def __str__(self):
         return f"{self.provider.name} Policy #{self.policy_number} for {self.patient}"
+
+from apps.billing.models import Invoice
+
+class InsuranceClaim(models.Model):
+    class ClaimStatus(models.TextChoices):
+        DRAFT = "DRAFT", "Draft Claim"
+        SUBMITTED = "SUBMITTED", "Submitted via EDI 837"
+        UNDER_REVIEW = "UNDER_REVIEW", "Payor Medical Review"
+        APPROVED = "APPROVED", "Approved for Payment"
+        PARTIALLY_APPROVED = "PARTIALLY_APPROVED", "Partially Approved"
+        DENIED = "DENIED", "Claim Denied"
+        PAID = "PAID", "Remittance Paid (EDI 835)"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    claim_number = models.CharField(max_length=64, unique=True, db_index=True)
+    policy = models.ForeignKey(PatientInsurancePolicy, on_delete=models.CASCADE, related_name="claims")
+    invoice = models.OneToOneField(Invoice, on_delete=models.CASCADE, related_name="insurance_claim")
+    
+    claimed_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    approved_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    copay_collected = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=32, choices=ClaimStatus.choices, default=ClaimStatus.DRAFT, db_index=True)
+    
+    primary_diagnosis_code = models.CharField(max_length=16, help_text="ICD-10 code")
+    adjudication_notes = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    adjudicated_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_insurance_claims"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Claim #{self.claim_number} ({self.status}) - ${self.claimed_amount}"
