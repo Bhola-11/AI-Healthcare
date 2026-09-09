@@ -92,3 +92,39 @@ class Allergy(models.Model):
 
     def __str__(self):
         return f"{self.allergen_name} ({self.severity}) - {self.patient}"
+
+class MedicalHistory(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="medical_history")
+    condition_name = models.CharField(max_length=255)
+    icd10_code = models.CharField(max_length=32, blank=True)
+    diagnosed_year = models.PositiveIntegerField(null=True, blank=True)
+    status = models.CharField(max_length=32, choices=[
+        ("ACTIVE", "Active Chronic Condition"),
+        ("IN_REMISSION", "In Remission"),
+        ("RESOLVED", "Resolved Historical Event")
+    ], default="ACTIVE")
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        db_table = "hs_patient_medical_history"
+
+
+class SurgicalHistory(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="surgical_history")
+    procedure_name = models.CharField(max_length=255)
+    surgery_year = models.PositiveIntegerField()
+    hospital_name = models.CharField(max_length=255, blank=True)
+    complications = models.TextField(blank=True)
+
+    class Meta:
+        db_table = "hs_patient_surgical_history"
+
+
+class FamilyHistory(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="family_history")
+    relative_relationship = models.CharField(max_length=64)
+    condition_name = models.CharField(max_length=255)
+    age_at_onset = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = "hs_patient_family_history"
