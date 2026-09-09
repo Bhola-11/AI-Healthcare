@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Lab Order #{{ order.order_number }} - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Diagnostic Order #{{ order.order_number }}</h1>
+            <p class="hs-text-muted">Patient: {{ order.patient.user.get_full_name }} | Status: <span class="hs-user-badge">{{ order.get_status_display }}</span></p>
+        </div>
+        {% if order.status != 'COMPLETED' %}
+        <a href="{% url 'laboratory:signoff' order.id %}" class="hs-btn" style="background: var(--hs-success); color: #fff;">Verify & Release Report</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-header">
+        <h3>Observed Laboratory Diagnostic Parameters</h3>
+    </div>
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Test Procedure</th>
+                    <th style="padding: 0.75rem;">LOINC</th>
+                    <th style="padding: 0.75rem;">Result Value</th>
+                    <th style="padding: 0.75rem;">Reference Range</th>
+                    <th style="padding: 0.75rem;">Diagnostic Flag</th>
+                    <th style="padding: 0.75rem;">Verification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ r.test.test_name }}</strong></td>
+                    <td style="padding: 0.75rem;"><code>{{ r.test.loinc_code }}</code></td>
+                    <td style="padding: 0.75rem;"><strong>{{ r.observed_numeric_value|default:r.observed_text_value }}</strong> {{ r.test.measurement_unit }}</td>
+                    <td style="padding: 0.75rem;">{{ r.reference_range_used|default:"Demographic Normal" }}</td>
+                    <td style="padding: 0.75rem;">
+                        <span class="hs-user-badge {% if 'CRITICAL' in r.flag %}hs-badge-urgent{% endif %}">{{ r.get_flag_display }}</span>
+                    </td>
+                    <td style="padding: 0.75rem;">{{ r.verified_by|default:"Pending Pathologist Signoff" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 1rem;" class="hs-text-muted">No result parameters entered.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
