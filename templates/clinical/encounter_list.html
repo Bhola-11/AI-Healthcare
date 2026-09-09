@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}EMR Encounters & Clinical Notes - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>EMR Clinical Encounters</h1>
+    <p class="hs-text-muted">Physician consultations, SOAP clinical documentation, and diagnostic coding</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Encounter #</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Clinician</th>
+                    <th style="padding: 0.75rem;">Class</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Date</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in encounters %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ e.encounter_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ e.patient.user.get_full_name }} ({{ e.patient.mrn }})</td>
+                    <td style="padding: 0.75rem;">Dr. {{ e.doctor.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">{{ e.get_encounter_class_display }}</td>
+                    <td style="padding: 0.75rem;"><span class="hs-user-badge">{{ e.get_status_display }}</span></td>
+                    <td style="padding: 0.75rem;">{{ e.start_time|date:"M d, Y - H:i" }}</td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'clinical_records:consultation' e.id %}" class="hs-btn hs-btn-primary-sm">Open Workspace</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="padding: 1rem;" class="hs-text-muted">No clinical encounters active.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
