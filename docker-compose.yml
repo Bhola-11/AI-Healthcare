@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  healthsphere-web:
+    build: .
+    container_name: healthsphere_app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - SECRET_KEY=hs-prod-insecure-change-in-vault-prod-key-992834
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web
+      - SECURE_SSL_REDIRECT=False
+    volumes:
+      - healthsphere_data:/app/data
+      - healthsphere_media:/app/mediafiles
+      - healthsphere_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  healthsphere_data:
+  healthsphere_media:
+  healthsphere_logs:
