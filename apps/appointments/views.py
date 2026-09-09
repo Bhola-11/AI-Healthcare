@@ -55,3 +55,18 @@ def check_in_patient(request, appointment_id):
     
     messages.success(request, f"Patient {appt.patient.user.get_full_name()} checked in! Token: {token_str}")
     return redirect('appointments:list')
+
+@login_required
+def live_queue_board(request):
+    today = timezone.now().date()
+    waiting_tickets = QueueTicket.objects.filter(
+        issued_at__date=today,
+        is_served=False
+    ).select_related('appointment__patient__user', 'appointment__doctor__user').order_by('issued_at')
+    
+    avg_wait_minutes = waiting_tickets.count() * 15 # 15 min per consultation
+    return render(request, 'appointments/queue_board.html', {
+        'tickets': waiting_tickets,
+        'count': waiting_tickets.count(),
+        'est_wait': avg_wait_minutes
+    })

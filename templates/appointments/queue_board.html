@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Live Clinic Waiting Queue - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Outpatient Clinic Waiting Queue</h1>
+    <p class="hs-text-muted">Real-time token display and estimated turnaround times</p>
+</div>
+
+<div class="hs-metrics-grid mt-4">
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Patients Waiting</div>
+        <div class="hs-metric-value hs-status-live">{{ count }}</div>
+    </div>
+    <div class="hs-metric-card">
+        <div class="hs-metric-title">Estimated Wait Time</div>
+        <div class="hs-metric-value">{{ est_wait }} mins</div>
+    </div>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-header">
+        <h3>Current Waiting Queue Board</h3>
+    </div>
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Token #</th>
+                    <th style="padding: 0.75rem;">Patient Name</th>
+                    <th style="padding: 0.75rem;">Attending Physician</th>
+                    <th style="padding: 0.75rem;">Checked In At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tickets %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong style="font-size: 1.2rem; color: var(--hs-primary);">{{ t.token_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ t.appointment.patient.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">Dr. {{ t.appointment.doctor.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">{{ t.issued_at|date:"H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="padding: 1rem;" class="hs-text-muted">Queue is currently clear. No patients waiting.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
