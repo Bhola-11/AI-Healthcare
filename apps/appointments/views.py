@@ -82,3 +82,10 @@ def cancel_appointment(request, appointment_id):
         messages.warning(request, f"Appointment #{appt.appointment_number} has been cancelled.")
         return redirect('appointments:list')
     return render(request, 'appointments/cancel.html', {'appointment': appt})
+
+@login_required
+def calendar_schedule_view(request):
+    appointments = Appointment.objects.filter(
+        status__in=[Appointment.Status.SCHEDULED, Appointment.Status.CHECKED_IN]
+    ).select_related('patient__user', 'doctor__user', 'facility')[:100]
+    return render(request, 'appointments/calendar.html', {'appointments': appointments})
