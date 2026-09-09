@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}404 Page / Record Not Found - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-card text-center" style="max-width: 600px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="font-size: 4rem; color: var(--hs-primary);">404</h1>
+    <h2>Page / Record Not Found</h2>
+    <p class="hs-text-muted mt-4">The requested patient file, encounter, or page does not exist.</p>
+    <div class="mt-4">
+        <a href="{% url 'accounts:dashboard' %}" class="hs-btn hs-btn-primary">Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

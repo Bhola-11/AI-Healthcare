@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}500 Internal Server Error - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-card text-center" style="max-width: 600px; margin: 4rem auto; padding: 2rem;">
+    <h1 style="font-size: 4rem; color: var(--hs-primary);">500</h1>
+    <h2>Internal Server Error</h2>
+    <p class="hs-text-muted mt-4">An internal clinical system error occurred. It has been securely logged.</p>
+    <div class="mt-4">
+        <a href="{% url 'accounts:dashboard' %}" class="hs-btn hs-btn-primary">Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
