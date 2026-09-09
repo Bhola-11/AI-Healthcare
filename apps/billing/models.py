@@ -30,3 +30,60 @@ class FeeSchedule(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.description} (${self.base_price})"
+
+class Invoice(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT", "Draft Pending Finalization"
+        ISSUED = "ISSUED", "Issued to Patient / Payor"
+        PARTIALLY_PAID = "PARTIALLY_PAID", "Partially Paid"
+        PAID = "PAID", "Fully Paid / Settled"
+        VOID = "VOID", "Voided / Cancelled"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice_number = models.CharField(max_length=32, unique=True, db_index=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="invoices")
+    encounter = models.ForeignKey(Encounter, on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices")
+    
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    
+    status = models.CharField(max_length=32, choices=Status.choices, default=Status.ISSUED, db_index=True)
+    due_date = models.DateField()
+    issued_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_billing_invoices"
+        ordering = ["-issued_at"]
+
+    @property
+    def balance_due(self):
+        return self.total_amount - self.amount_paid
+
+    def calculate_totals(self):
+        self.subtotal = sum((item.quantity * item.unit_price) for item in self.items.all())
+        self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
+        self.save()
+
+    def __str__(self):
+        return f"Invoice #{self.invoice_number} - {self.patient.user.get_full_name()} (${self.total_amount})"
+
+
+class InvoiceItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
+    fee_schedule = models.ForeignKey(FeeSchedule, on_delete=models.SET_NULL, null=True, blank=True)
+    item_description = models.CharField(max_length=255)
+    quantity = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    line_total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = "hs_billing_invoice_items"
+
+    def save(self, *args, **kwargs):
+        self.line_total = self.quantity * self.unit_price
+        super().save(*args, **kwargs)
