@@ -52,3 +52,32 @@ class Encounter(models.Model):
 
     def __str__(self):
         return f"Encounter #{self.encounter_number} - {self.patient} with Dr. {self.doctor.user.get_full_name()}"
+
+class SOAPNote(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    encounter = models.OneToOneField(Encounter, on_delete=models.CASCADE, related_name="soap_note")
+    
+    # Subjective: Patient symptoms, history of present illness (HPI), review of systems (ROS)
+    subjective = models.TextField(help_text="Chief complaint, HPI, review of systems, patient-reported symptoms.")
+    
+    # Objective: Physical examination findings, vital signs observed, lab data
+    objective = models.TextField(help_text="Physical exam findings, clinical observations, physical inspection.")
+    
+    # Assessment: Medical appraisal, differential diagnoses, clinical reasoning
+    assessment = models.TextField(help_text="Clinical synthesis, diagnostic impressions, disease staging.")
+    
+    # Plan: Therapeutic orders, medications, procedures, patient education, follow-up
+    plan = models.TextField(help_text="Management plan, e-prescriptions, diagnostic orders, lifestyle advisories.")
+    
+    is_signed = models.BooleanField(default=False)
+    signed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "hs_clinical_soap_notes"
+
+    def sign_note(self):
+        self.is_signed = True
+        self.signed_at = timezone.now()
+        self.save()
