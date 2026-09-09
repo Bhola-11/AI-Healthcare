@@ -1,0 +1,7 @@
+[
+  {"model": "doctors.specialty", "fields": {"name": "Interventional Cardiology", "code": "INT-CARD", "description": "Catheter-based treatment of structural heart diseases.", "board_name": "ABIM"}},
+  {"model": "doctors.specialty", "fields": {"name": "Gastroenterology", "code": "GASTRO", "description": "Digestive system and hepatobiliary medicine.", "board_name": "ABIM"}},
+  {"model": "doctors.specialty", "fields": {"name": "Pulmonology & Critical Care", "code": "PULM", "description": "Respiratory illnesses and mechanical ventilation.", "board_name": "ABIM"}},
+  {"model": "doctors.specialty", "fields": {"name": "Nephrology", "code": "NEPH", "description": "Renal physiology, dialysis, and electrolyte disorders.", "board_name": "ABIM"}},
+  {"model": "doctors.specialty", "fields": {"name": "Endocrinology", "code": "ENDO", "description": "Hormonal, thyroid, and diabetic metabolism management.", "board_name": "ABIM"}}
+]
