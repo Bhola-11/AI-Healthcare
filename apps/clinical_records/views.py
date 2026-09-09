@@ -64,3 +64,10 @@ def encounter_compare(request, patient_id):
     patient = get_object_or_404(PatientProfile, id=patient_id)
     encounters = Encounter.objects.filter(patient=patient).select_related('soap_note', 'doctor__user').order_by('-start_time')[:5]
     return render(request, 'clinical/compare.html', {'patient': patient, 'encounters': encounters})
+
+from django.http import HttpResponse
+
+@login_required
+def encounter_summary_print(request, encounter_id):
+    encounter = get_object_or_404(Encounter, id=encounter_id)
+    return render(request, 'clinical/summary_print.html', {'encounter': encounter})
