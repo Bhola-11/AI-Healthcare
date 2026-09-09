@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Pharmacy Dispensing Workbench - HealthSphere{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Pharmacy Dispensing Workbench</h1>
+    <p class="hs-text-muted">Doctor e-prescriptions awaiting clinical review and medication dispensation</p>
+</div>
+
+<div class="hs-card mt-4">
+    <div class="hs-card-body">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--hs-border); text-align: left;">
+                    <th style="padding: 0.75rem;">Rx #</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Prescribing Physician</th>
+                    <th style="padding: 0.75rem;">Ordered Items</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in prescriptions %}
+                <tr style="border-bottom: 1px solid var(--hs-border);">
+                    <td style="padding: 0.75rem;"><strong>{{ r.rx_number }}</strong></td>
+                    <td style="padding: 0.75rem;">{{ r.patient.user.get_full_name }} ({{ r.patient.mrn }})</td>
+                    <td style="padding: 0.75rem;">Dr. {{ r.doctor.user.get_full_name }}</td>
+                    <td style="padding: 0.75rem;">
+                        {% for i in r.items.all %}
+                        {{ i.medication_name }} {{ i.dosage }} (Qty: {{ i.quantity }})<br>
+                        {% endfor %}
+                    </td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'pharmacy:dispense' r.id %}" class="hs-btn hs-btn-primary-sm">Fulfill & Dispense</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="padding: 1rem;" class="hs-text-muted">No pending prescriptions in queue.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
