@@ -53,3 +53,22 @@ class DrugInteractionRule(models.Model):
 
     def __str__(self):
         return f"{self.drug_a} + {self.drug_b} ({self.severity})"
+
+class ClinicalRiskScoreLog(models.Model):
+    class RiskCategory(models.TextChoices):
+        LOW = "LOW", "Low Clinical Risk"
+        MODERATE = "MODERATE", "Moderate Risk"
+        HIGH = "HIGH", "High Clinical Risk"
+        VERY_HIGH = "VERY_HIGH", "Critical / Very High Risk"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="risk_scores")
+    score_name = models.CharField(max_length=64, help_text="e.g. Framingham 10-Year ASCVD, Glasgow-Blatchford")
+    calculated_score = models.DecimalField(max_digits=6, decimal_places=2)
+    risk_category = models.CharField(max_length=32, choices=RiskCategory.choices, default=RiskCategory.LOW)
+    explanation = models.TextField()
+    calculated_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_ai_risk_score_logs"
+        ordering = ["-calculated_at"]
