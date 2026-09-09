@@ -150,7 +150,7 @@ class LabResultItem(models.Model):
         return self.Flag.NORMAL
 
     def save(self, *args, **kwargs):
-        if self.observed_numeric_value is not None and not self.flag:
+        if self.observed_numeric_value is not None:
             self.flag = self.calculate_flag()
         super().save(*args, **kwargs)
 
