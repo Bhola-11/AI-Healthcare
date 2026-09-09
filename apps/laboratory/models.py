@@ -63,3 +63,34 @@ class DemographicReferenceRange(models.Model):
 
     def __str__(self):
         return f"{self.test.test_name} Range ({self.gender}, {self.min_age_years}-{self.max_age_years}y): {self.normal_min} - {self.normal_max} {self.test.measurement_unit}"
+
+class LabOrder(models.Model):
+    class OrderPriority(models.TextChoices):
+        ROUTINE = "ROUTINE", "Routine Outpatient"
+        URGENT = "URGENT", "Urgent Clinical Priority"
+        STAT = "STAT", "Emergency STAT Immediate"
+
+    class OrderStatus(models.TextChoices):
+        PLACED = "PLACED", "Order Placed"
+        COLLECTED = "COLLECTED", "Specimen Collected"
+        PROCESSING = "PROCESSING", "In Analyzer Processing"
+        COMPLETED = "COMPLETED", "Verified & Completed"
+        CANCELLED = "CANCELLED", "Cancelled"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order_number = models.CharField(max_length=32, unique=True, db_index=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="lab_orders")
+    ordering_doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name="lab_orders")
+    encounter = models.ForeignKey(Encounter, on_delete=models.SET_NULL, null=True, blank=True, related_name="lab_orders")
+    priority = models.CharField(max_length=16, choices=OrderPriority.choices, default=OrderPriority.ROUTINE)
+    status = models.CharField(max_length=32, choices=OrderStatus.choices, default=OrderStatus.PLACED, db_index=True)
+    clinical_indication = models.TextField(blank=True)
+    ordered_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "hs_lab_orders"
+        ordering = ["-ordered_at"]
+
+    def __str__(self):
+        return f"LabOrder #{self.order_number} for {self.patient} ({self.status})"
