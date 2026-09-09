@@ -87,3 +87,36 @@ class InvoiceItem(models.Model):
     def save(self, *args, **kwargs):
         self.line_total = self.quantity * self.unit_price
         super().save(*args, **kwargs)
+
+class Payment(models.Model):
+    class PaymentMethod(models.TextChoices):
+        CASH = "CASH", "Cash Currency"
+        CREDIT_CARD = "CREDIT_CARD", "Credit / Debit Card"
+        INSURANCE_COPAY = "INSURANCE_COPAY", "Insurance Co-payment"
+        BANK_TRANSFER = "BANK_TRANSFER", "Electronic Bank Wire (ACH)"
+        CHECK = "CHECK", "Paper Check"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    payment_reference = models.CharField(max_length=64, unique=True, db_index=True)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="payments")
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=32, choices=PaymentMethod.choices, default=PaymentMethod.CREDIT_CARD)
+    transaction_id = models.CharField(max_length=128, blank=True)
+    received_by = models.CharField(max_length=255, default="Cashier Desk")
+    paid_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "hs_billing_payments"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Update invoice amount paid
+        self.invoice.amount_paid = sum(p.amount for p in self.invoice.payments.all())
+        if self.invoice.amount_paid >= self.invoice.total_amount:
+            self.invoice.status = Invoice.Status.PAID
+        elif self.invoice.amount_paid > 0:
+            self.invoice.status = Invoice.Status.PARTIALLY_PAID
+        self.invoice.save()
+
+    def __str__(self):
+        return f"Payment #{self.payment_reference} (${self.amount}) for Invoice #{self.invoice.invoice_number}"
