@@ -48,3 +48,20 @@ class PatientProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.mrn})"
+
+class EmergencyContact(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="emergency_contacts")
+    name = models.CharField(max_length=150)
+    relationship = models.CharField(max_length=64, choices=[
+        ("SPOUSE", "Spouse"), ("PARENT", "Parent"), ("CHILD", "Child"),
+        ("SIBLING", "Sibling"), ("GUARDIAN", "Legal Guardian"), ("FRIEND", "Friend")
+    ])
+    phone_number = models.CharField(max_length=32)
+    email = models.EmailField(blank=True)
+    is_primary = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "hs_patient_emergency_contacts"
+
+    def __str__(self):
+        return f"{self.name} ({self.relationship}) - {self.phone_number}"
