@@ -1,0 +1,45 @@
+﻿# Standard poetry.lock for TrainPlex grading tools
+[[package]]
+name = "django"
+version = "5.0.3"
+description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+optional = false
+python-versions = ">=3.10"
+files = []
+
+[[package]]
+name = "djangorestframework"
+version = "3.14.0"
+description = "Web APIs for Django, made easy."
+optional = false
+python-versions = ">=3.7"
+files = []
+
+[[package]]
+name = "drf-spectacular"
+version = "0.27.1"
+description = "Sane and flexible OpenAPI 3 schema generation for Django REST framework."
+optional = false
+python-versions = ">=3.7"
+files = []
+
+[[package]]
+name = "whitenoise"
+version = "6.6.0"
+description = "Radically simplified static file serving for WSGI applications."
+optional = false
+python-versions = ">=3.8"
+files = []
+
+[[package]]
+name = "gunicorn"
+version = "21.2.0"
+description = "WSGI HTTP Server for UNIX"
+optional = false
+python-versions = ">=3.7"
+files = []
+
+[metadata]
+lock-version = "2.0"
+python-versions = ">=3.11"
+content-hash = "c1b7e4521e42a98e82ef47413693e8e19e0e33ef73bf1a98be4c34a2e873f4e1"

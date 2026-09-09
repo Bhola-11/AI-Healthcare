@@ -1,0 +1,15 @@
+﻿{
+    "_meta": {
+        "hash": {"sha256": "c1b7e4521e42a98e82ef47413693e8e19e0e33ef73bf1a98be4c34a2e873f4e1"},
+        "pipfile-spec": 6,
+        "requires": {"python_version": "3.11"},
+        "sources": [{"name": "pypi", "url": "https://pypi.org/simple", "verify_ssl": true}]
+    },
+    "default": {
+        "django": {"version": "==5.0.3"},
+        "djangorestframework": {"version": "==3.14.0"},
+        "drf-spectacular": {"version": "==0.27.1"},
+        "whitenoise": {"version": "==6.6.0"}
+    },
+    "develop": {}
+}
