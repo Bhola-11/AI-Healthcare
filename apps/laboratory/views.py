@@ -32,3 +32,9 @@ def pathologist_signoff(request, order_id):
         messages.success(request, f"Laboratory diagnostic order #{order.order_number} verified and released by Pathologist.")
         return redirect('laboratory:detail', order_id=order.id)
     return render(request, 'laboratory/signoff_confirm.html', {'order': order})
+
+@login_required
+def lab_report_print(request, order_id):
+    order = get_object_or_404(LabOrder, id=order_id)
+    results = order.results.select_related('test').all()
+    return render(request, 'laboratory/report_print.html', {'order': order, 'results': results})
