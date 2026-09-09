@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Comparative Encounter Review - {{ patient.user.get_full_name }}{% endblock %}
+{% block content %}
+<div class="hs-dashboard-header">
+    <h1>Longitudinal Encounter Comparison</h1>
+    <p class="hs-text-muted">Side-by-side progression review for {{ patient.user.get_full_name }} ({{ patient.mrn }})</p>
+</div>
+
+<div class="hs-metrics-grid mt-4">
+    {% for e in encounters %}
+    <div class="hs-card">
+        <div class="hs-card-header">
+            <h4>{{ e.start_time|date:"M d, Y" }}</h4>
+            <small class="hs-text-muted">Dr. {{ e.doctor.user.get_full_name }}</small>
+        </div>
+        <div class="hs-card-body" style="font-size: 0.85rem;">
+            <p><strong>Subjective:</strong> {{ e.soap_note.subjective|truncatewords:20|default:"N/A" }}</p>
+            <p class="mt-2"><strong>Objective:</strong> {{ e.soap_note.objective|truncatewords:20|default:"N/A" }}</p>
+            <p class="mt-2"><strong>Assessment:</strong> {{ e.soap_note.assessment|truncatewords:20|default:"N/A" }}</p>
+            <p class="mt-2"><strong>Plan:</strong> {{ e.soap_note.plan|truncatewords:20|default:"N/A" }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

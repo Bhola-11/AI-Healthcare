@@ -58,3 +58,9 @@ def add_diagnosis(request, encounter_id):
             d.save()
             messages.success(request, f"Diagnosis {d.icd10.code} added.")
     return redirect('clinical_records:consultation', encounter_id=encounter.id)
+
+@login_required
+def encounter_compare(request, patient_id):
+    patient = get_object_or_404(PatientProfile, id=patient_id)
+    encounters = Encounter.objects.filter(patient=patient).select_related('soap_note', 'doctor__user').order_by('-start_time')[:5]
+    return render(request, 'clinical/compare.html', {'patient': patient, 'encounters': encounters})
